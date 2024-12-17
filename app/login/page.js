@@ -19,12 +19,13 @@ const Page = () => {
 
     useEffect(() => {
         if (message) {
-            setShowMessage(true); // Show the message when it's set
+            setShowMessage(true);
             const timer = setTimeout(() => {
-                setShowMessage(false); // Hide the message after 2 seconds
+                setShowMessage(false);
+                setMessage(""); // Clear message after timeout
             }, 2000);
 
-            return () => clearTimeout(timer); // Cleanup the timer
+            return () => clearTimeout(timer);
         }
     }, [message]); // Only run the effect when message changes
 
@@ -32,29 +33,22 @@ const Page = () => {
         e.preventDefault();
 
         try {
-            console.log("Attempting to log in with:", { email, password });
-
             const res = await fetch("/api/auth/Login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
 
             const data = await res.json();
-            console.log("Response data:", data);
 
             if (res.status === 200) {
-                console.log("Login successful!");
                 setMessage("Login successful!");
-                router.push("/dashboard"); // Use router directly
+                router.push("/dashboard");
             } else {
-                console.log("Error message:", data.message);
-                setMessage(data.message);
+                setMessage(data.message || "Login failed. Please try again.");
             }
         } catch (error) {
-            console.error("An error occurred during login:", error);
+            console.error("Error during login:", error);
             setMessage("An unexpected error occurred. Please try again.");
         }
     };
@@ -74,6 +68,12 @@ const Page = () => {
                     <img className="main266" src="/image1.png" alt="Image" />
                 </div>
                 <form className="form" onSubmit={handleSubmit}>
+                    {/* Message Pop-Up */}
+                    {showMessage && (
+                        <div className="message-popup text-red-800">
+                            <p>{message}</p>
+                        </div>
+                    )}
                     <div className="flex-column">
                         <label>Email</label>
                     </div>
@@ -128,7 +128,7 @@ const Page = () => {
                         <button
                             type="button"
                             onClick={togglePasswordVisibility} // Toggle password visibility
-                            className="show-password-btn mb-6"
+                            className="show-password-btn mb-3 mr-3"
                         >
                             {passwordVisible ? <img className="imagewe" src={"/eye.png"} /> : <img className="imagewe" src={"/visible.png"} />}
                         </button>

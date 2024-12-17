@@ -1,5 +1,3 @@
-// app/api/auth/Register/route.js
-
 import { prisma } from "../../../../lib/prisma";
 import bcrypt from "bcryptjs";
 
@@ -9,25 +7,29 @@ export async function POST(req) {
 
     // Basic validation
     if (!name || !email || !password) {
-      return new Response("All fields are required.", { status: 400 });
+      return new Response(
+        JSON.stringify({ message: "All fields are required." }),
+        { status: 400 }
+      );
     }
 
     // Check if user already exists
     const existingUser = await prisma.users.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (existingUser) {
-      return new Response("User already exists.", { status: 409 });
+      return new Response(
+        JSON.stringify({ message: "User already exists." }),
+        { status: 409 }
+      );
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the new user
-    const newUser = await prisma.users.create({
+    await prisma.users.create({
       data: {
         name,
         email,
@@ -35,11 +37,15 @@ export async function POST(req) {
       },
     });
 
-    return new Response(JSON.stringify({ message: "User created successfully!" }), {
-      status: 201,
-    });
+    return new Response(
+      JSON.stringify({ message: "User created successfully!" }),
+      { status: 201 }
+    );
   } catch (error) {
-    console.error(error);
-    return new Response("Internal Server Error", { status: 500 });
+    console.error("Error during registration:", error);
+    return new Response(
+      JSON.stringify({ message: "Internal Server Error" }),
+      { status: 500 }
+    );
   }
 }

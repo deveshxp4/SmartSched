@@ -23,22 +23,38 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/auth/Register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
+    setMessage(""); // Clear any previous messages before making a request
 
-    const data = await res.json();
+    try {
+      const res = await fetch('/api/auth/Register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (res.status === 201) {
-      setMessage('Registration successful!');
-      router.push('/login');  // Now router is available, can navigate
-    } else {
-      setMessage(data.message);
+      const data = await res.json();
+
+      if (res.status === 201) {
+        // Success: Display success message and redirect
+        setMessage("Registration successful!");
+        router.push('/login');
+      } else {
+        // Error: Display the backend error message
+        setMessage(data.message || "Something went wrong!");
+      }
+    } catch (error) {
+      // Handle network or unexpected errors
+      setMessage("Failed to connect to the server. Please try again.");
     }
+  };
+
+  // for password visibility
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  // toggle password visibility
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
   };
 
   const handleChange = (e) => {
@@ -60,12 +76,22 @@ const Signup = () => {
           <img className="rom" src="/image45.png" />
         </div>
         <div className="form1 ">
-          <form  onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
+            {message && (
+              <div
+                style={{
+                  color: message.includes("successful") ? "green" : "red",
+                  marginBottom: "10px",
+                }}
+              >
+                {message}
+              </div>
+            )}
             <div className="flex-column">
               <label>Name</label>
             </div>
             <div className="inputForm">
-            <svg
+              <svg
                 height="60"
                 viewBox="0 -9 32 32"
                 width="40"
@@ -90,7 +116,7 @@ const Signup = () => {
               <label>Email</label>
             </div>
             <div className="inputForm">
-            <svg
+              <svg
                 height="20"
                 viewBox="0 0 32 32"
                 width="20"
@@ -115,7 +141,7 @@ const Signup = () => {
               <label>Password</label>
             </div>
             <div className="inputForm">
-            <svg
+              <svg
                 height="20"
                 viewBox="-64 0 512 512"
                 width="20"
@@ -129,13 +155,19 @@ const Signup = () => {
                 ></path>
               </svg>
               <input
-                type="password"
+                type={passwordVisible ? "text" : "password"}
                 className="input"
                 placeholder="Enter your Password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
               />
+              <div
+                className="cursor-pointer  w-4 mr-4"
+                onClick={() => setPasswordVisible(!passwordVisible)}
+              >
+                {passwordVisible ? <img src="/eye.png" alt="eye" /> : <img src="/visible.png" alt="eye" />}
+              </div>
             </div>
 
             <button
@@ -152,7 +184,7 @@ const Signup = () => {
             </Link>
             <div className="flex-row">
               <button className="btn google">
-              <svg
+                <svg
                   version="1.1"
                   width="20"
                   id="Layer_1"
@@ -192,7 +224,7 @@ const Signup = () => {
                 Google
               </button>
               <button className="btn apple">
-              <svg version="1.1" height="20" width="20" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22.773 22.773" style={{ enableBackground: "new 0 0 22.773 22.773" }} xmlSpace="preserve">
+                <svg version="1.1" height="20" width="20" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22.773 22.773" style={{ enableBackground: "new 0 0 22.773 22.773" }} xmlSpace="preserve">
                   <g>
                     <g>
                       <path d="M15.769,0c0.053,0,0.106,0,0.162,0c0.13,1.606-0.483,2.806-1.228,3.675c-0.731,0.863-1.732,1.7-3.351,1.573 c-0.108-1.583,0.506-2.694,1.25-3.561C13.292,0.879,14.557,0.16,15.769,0z"></path>
