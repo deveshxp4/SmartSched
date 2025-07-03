@@ -1,14 +1,18 @@
 // app/api/auth/Login/route.js
 
-import { prisma } from "../../../../lib/prisma";
+import { PrismaClient } from '@prisma/client';
 import bcrypt from "bcryptjs";
 import cookie from "cookie";
+import jwt from "jsonwebtoken";
+
+const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
+    // Parse JSON body from the request
     const { email, password } = await req.json();
 
-    // Basic validation
+    // Basic validation: Ensure both email and password are provided
     if (!email || !password) {
       return new Response(
         JSON.stringify({ message: "Email and password are required.", status: "error" }),
@@ -16,11 +20,9 @@ export async function POST(req) {
       );
     }
 
-    // Check if user exists
+    // Check if the user exists in the database (using model "users")
     const user = await prisma.users.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (!user) {
@@ -30,8 +32,8 @@ export async function POST(req) {
       );
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Verify the provided password against the stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password || "");
     if (!isPasswordValid) {
       return new Response(
         JSON.stringify({ message: "Invalid password.", status: "error" }),
@@ -39,20 +41,27 @@ export async function POST(req) {
       );
     }
 
-    // Create a session (store the user ID in a cookie)
+    // Generate a JWT token with the user's ID
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET || 'fallback_secret',
+      { expiresIn: '7d' }
+    );
+
+    // Create a session cookie that stores the JWT token
     const sessionCookie = cookie.serialize(
       "user_session",
-      JSON.stringify({ userId: user.id }),
+      token,
       {
-        httpOnly: true, // Prevents access to the cookie via JavaScript
-        secure: process.env.NODE_ENV === "production", // Set secure cookies in production
-        sameSite: "Strict", // Cookies sent for same-site requests only
-        maxAge: 60 * 60 * 24 * 7, // Expires in 1 week
-        path: "/", // Cookie available site-wide
+        httpOnly: true, // Makes the cookie inaccessible to JavaScript on the client side
+        secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS in production
+        sameSite: "Strict", // Restricts the cookie to same-site requests only
+        maxAge: 60 * 60 * 24 * 7, // Cookie expires in one week
+        path: "/", // The cookie is available across the entire site
       }
     );
 
-    // Successful Login
+    // Return a successful response along with the session cookie
     return new Response(
       JSON.stringify({
         message: "Login successful!",

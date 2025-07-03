@@ -11,10 +11,12 @@
   "dependencies": {
     "@prisma/client": "^6.0.1",
     "bcryptjs": "^2.4.3",
-    "chart.js": "^4.4.7",
+    "chart.js": "^4.4.9",
     "cloudinary": "^2.5.1",
     "cookie": "^1.0.2",
     "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.508.0",
     "multer": "^1.4.5-lts.1",
     "next": "15.1.0",
     "next-auth": "^4.24.11",
@@ -22,6 +24,7 @@
     "pg": "^8.13.1",
     "prisma": "^6.0.1",
     "react": "^19.0.0",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "streamifier": "^0.1.1",
     "uuid": "^11.0.3"
