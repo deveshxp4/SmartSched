@@ -81,7 +81,7 @@ const Signup = () => {
     <>
       <div className="container flex">
         <div>
-          <img className="rom" src="/image45.png" />
+          <img className="rom" src="/image45.png" alt="Registration illustration" />
         </div>
         <div className="form1 ">
           <form onSubmit={handleSubmit}>
@@ -174,7 +174,7 @@ const Signup = () => {
                 className="cursor-pointer  w-4 mr-4"
                 onClick={() => setPasswordVisible(!passwordVisible)}
               >
-                {passwordVisible ? <img src="/eye.png" alt="eye" /> : <img src="/visible.png" alt="eye" />}
+                {passwordVisible ? <img src="/eye.png" alt="Hide password" /> : <img src="/visible.png" alt="Show password" />}
               </div>
             </div>
 

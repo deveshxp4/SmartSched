@@ -68,7 +68,7 @@ const Page = () => {
         <>
             <div className="flex main100 gap-28">
                 <div>
-                    <img className="main266" src="/image1.png" alt="Image" />
+                    <img className="main266" src="/image1.png" alt="Login illustration" />
                 </div>
                 <form className="form" onSubmit={handleSubmit}>
                     {showMessage && (
@@ -107,7 +107,7 @@ const Page = () => {
                             onClick={togglePasswordVisibility}
                             className="show-password-btn mb-3 mr-3"
                         >
-                            {passwordVisible ? <img className="imagewe" src={"/eye.png"} /> : <img className="imagewe" src={"/visible.png"} />}
+                            {passwordVisible ? <img className="imagewe" src={"/eye.png"} alt="Hide password" /> : <img className="imagewe" src={"/visible.png"} alt="Show password" />}
                         </button>
                     </div>
 
@@ -121,7 +121,7 @@ const Page = () => {
                     
                     <div className="mt-4 text-center">
                         <p className="text-gray-600">
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <Link href="/Register" className="text-blue-600 hover:text-blue-800 font-medium">
                                 Sign up here
                             </Link>

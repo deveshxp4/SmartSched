@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -17,13 +17,7 @@ const MLDashboard = ({ userId }) => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
-    if (userId) {
-      fetchAnalytics();
-    }
-  }, [userId]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/ml-analytics?userId=${userId}&days=30`);
@@ -40,7 +34,13 @@ const MLDashboard = ({ userId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchAnalytics();
+    }
+  }, [userId, fetchAnalytics]);
 
   if (loading) {
     return (

@@ -19,15 +19,15 @@ export default function Home() {
         </Link>
             <div className="main5 flex">
               <ul className="flex gap-2">
-                <li className="main6"><img src="/image2.png" /></li>
+                <li className="main6"><img src="/image2.png" alt="Simplified scheduling icon" /></li>
                 <li className="w-32">Simplified Scheduling</li>
               </ul>
               <ul className="flex gap-2">
-                <li className="main6"><img src="/image3.png" /></li>
+                <li className="main6"><img src="/image3.png" alt="Personalized and adaptable icon" /></li>
                 <li className="w-32">Personalized & Adaptable</li>
               </ul>
               <ul className="flex gap-2">
-                <li className="main6"><img src="/image4.png" /></li>
+                <li className="main6"><img src="/image4.png" alt="Enhanced student collaboration icon" /></li>
                 <li className="w-32">Enhanced Student Collaboration</li>
               </ul>
             </div>
@@ -35,14 +35,14 @@ export default function Home() {
         </div>
         <div className="right">
           <div className="top flex justify-end">
-            <img className="bok" src="/image1.png" alt="Image description" />
+            <img className="bok" src="/image1.png" alt="Main illustration" />
           </div>
         </div>
       </div>
 
       <div className="mt-32">
         <div className="left">
-          <img className="main8" src="/image7.png" />
+          <img className="main8" src="/image7.png" alt="Time management illustration" />
           <div className="tutu">Empower Students with Time Management</div>
         </div>
 
@@ -59,22 +59,22 @@ export default function Home() {
         <p className="main11">My Site offers a user-friendly platform that allows students to create customized timetables, set reminders, and sync schedules across devices</p>z
         <div className="main12 flex ">
           <div className="main14 p-5 m-2 ">
-            <img className="main13 m-3 " src="/image10.png" />
+            <img className="main13 m-3 " src="/image10.png" alt="Task management icon" />
             <h1 className="font-bold m-3 ml-7 text-xl">Seamless Task Management</h1>
             <p className="w-44  ml-7">Our platform enables students to streamline their tasks, track progress, and collaborate with peers on group projects and study sessions.</p>
           </div>
           <div className="main14 p-5 m-2 ">
-            <img className="main13 m-3 " src="/image11.png" />
+            <img className="main13 m-3 " src="/image11.png" alt="Study solution icon" />
             <h1 className="font-bold m-3 ml-7 text-xl">All-Inclusive Study Solution</h1>
             <p className="w-44  ml-7">My Site provides a comprehensive solution for students, including study resources, progress analytics, and performance tracking features.</p>
           </div>
           <div className="main14 p-5 m-2 ">
-            <img className="main13 m-3 " src="/image12.png" />
+            <img className="main13 m-3 " src="/image12.png" alt="Student support icon" />
             <h1 className="font-bold m-3 ml-7 text-xl ">Dedicated Student Support</h1>
             <p className="w-44  ml-7">We are committed to offering personalized support to students, ensuring they make the most of our timetable management tools and educational resources.</p>
           </div>
           <div className="main14 p-5 m-2 ">
-            <img className="main13 m-3 " src="/image14.png" />
+            <img className="main13 m-3 " src="/image14.png" alt="Automation features icon" />
             <h1 className="font-bold m-3 ml-7 text-xl ">Efficient Automation Features</h1>
             <p className="w-44  ml-7">Our platform incorporates smart automation tools to simplify repetitive tasks, optimize study routines, and enhance productivity.</p>
           </div>
@@ -84,7 +84,7 @@ export default function Home() {
 
       <div className="flex">
         <div className=" main20 mt-24 ml-48">
-          <img src="/image15.png" />
+          <img src="/image15.png" alt="Student-focused design illustration" />
         </div>
         <div className="right3 mt-52 ml-56 ">
           <div>
@@ -95,15 +95,15 @@ export default function Home() {
         </div >
         <div className=" main22 flex gap-14 ">
           <ul className="flex gap-2">
-            <li className="main6"><img src="/image16.png" /></li>
+            <li className="main6"><img src="/image16.png" alt="All-in-one toolkit icon" /></li>
             <li className="w-20">All-In-One Toolkit</li>
           </ul>
           <ul className="flex gap-2">
-            <li className="main6"><img src="/image17 (2).png" /></li>
+            <li className="main6"><img src="/image17 (2).png" alt="Integrated task management icon" /></li>
             <li className="w-32">Integrated Task Management</li>
           </ul>
           <ul className="flex gap-2">
-            <li className="main6"><img src="/image18.png" /></li>
+            <li className="main6"><img src="/image18.png" alt="Flexibility and control icon" /></li>
             <li className="w-32">Total Flexibility and Controll</li>
           </ul>
         </div>
@@ -112,9 +112,9 @@ export default function Home() {
       <div>
         <h1 className="text-5xl ml-40 mt-40  mb-12">What Our Users Say</h1>
         <div className="flex justify-center gap-8 mt-28 ">
-          <img className="main30" src="/image22.png" />
-          <img className="main30" src="/image20.png" />
-          <img className="main31 " src="/image21.png" />
+          <img className="main30" src="/image22.png" alt="User testimonial 1" />
+          <img className="main30" src="/image20.png" alt="User testimonial 2" />
+          <img className="main31 " src="/image21.png" alt="User testimonial 3" />
         </div>
       </div>
 
@@ -172,11 +172,11 @@ export default function Home() {
 
       <div className="name1">
         <div className="">
-          <div className=" main41 text-5xl ">Elevate your academic productivity with My Site's intuitive timetable management solutions.</div>
+          <div className=" main41 text-5xl ">Elevate your academic productivity with My Site&apos;s intuitive timetable management solutions.</div>
           <button className=" mt-4  relative px-8 py-2 rounded-md bg-white isolation-auto z-10 border-2 border-zinc-950
         before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-right-full before:hover:right-0 before:rounded-full  before:bg-yellow-500 before:-z-10  before:aspect-square before:hover:scale-150 overflow-hidden before:hover:duration-700">Get Started</button>
         </div>
-        <img className="main50  z-50" src="/image45.png" />
+        <img className="main50  z-50" src="/image45.png" alt="Academic productivity illustration" />
       </div>
     </>
   );

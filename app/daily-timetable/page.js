@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import "../dashboard/style.css";
 import "./style.css";
@@ -93,7 +93,7 @@ const DailyTimetable = () => {
   };
 
   // Calculate and update task statistics
-  const updateTaskStats = async () => {
+  const updateTaskStats = useCallback(async () => {
     if (!userId || todayTasks.length === 0) return;
     
     try {
@@ -123,10 +123,10 @@ const DailyTimetable = () => {
     } catch (error) {
       console.error('Error updating task statistics:', error);
     }
-  };
+  }, [userId, todayTasks.length, completions, currentDate]);
 
   // Extract tasks for the current day from timetable
-  const extractTasksForDay = (timetable, date) => {
+  const extractTasksForDay = useCallback((timetable, date) => {
     try {
       const dayOfWeek = getDayOfWeek(date);
       const isWeekdaySchedule = isWeekday(date);
@@ -186,7 +186,7 @@ const DailyTimetable = () => {
       console.error("Error extracting tasks:", error);
       return [];
     }
-  };
+  }, [isWeekday]);
   
   // Fetch user timetable and task completions
   useEffect(() => {
@@ -291,7 +291,7 @@ const DailyTimetable = () => {
     };
     
     fetchData();
-  }, [currentDate]);
+  }, [currentDate, extractTasksForDay, updateTaskStats]);
   
   // When date changes, update task list
   useEffect(() => {
@@ -299,7 +299,7 @@ const DailyTimetable = () => {
       const tasks = extractTasksForDay(timetable, currentDate);
       setTodayTasks(tasks);
     }
-  }, [currentDate, timetable]);
+  }, [currentDate, timetable, extractTasksForDay]);
 
   if (loading) {
     return (
@@ -353,7 +353,7 @@ const DailyTimetable = () => {
           </div>
           
           <div className="task-list">
-            <h3>Today's Schedule</h3>
+            <h3>Today&apos;s Schedule</h3>
             
             {todayTasks.length === 0 ? (
               <div>

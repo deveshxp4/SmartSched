@@ -189,7 +189,7 @@ const Dashboard = () => {
                 <div className="bg-green-50 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-green-600">Today's Tasks</p>
+                      <p className="text-sm font-medium text-green-600">Today&apos;s Tasks</p>
                       <p className="text-lg font-semibold">{timetable ? "View Daily" : "Generate First"}</p>
                     </div>
                     <CheckSquare className="text-green-600" size={24} />
