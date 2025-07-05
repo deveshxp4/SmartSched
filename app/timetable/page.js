@@ -9,6 +9,7 @@ const TimetableGenerator = () => {
   const [weekendWakeUp, setWeekendWakeUp] = useState("08:00");
   const [weekendSleep, setWeekendSleep] = useState("24:00");
   const [examMode, setExamMode] = useState(false);
+  const [useML, setUseML] = useState(true);
 
   // Meal times
   const [lunchTime, setLunchTime] = useState("12:20");
@@ -49,13 +50,22 @@ const TimetableGenerator = () => {
     const fetchTimetable = async () => {
       setFetching(true);
       try {
-        const response = await fetch(`/api/timetable?userId=1`); // Replace with actual user ID
-        const data = await response.json();
-        if (data.success) {
-          setTimetable({
-            weekdays: data.timetable.weekdays,
-            weekends: data.timetable.weekends
-          });
+        // First get the current user
+        const userResponse = await fetch("/api/auth/User");
+        const userData = await userResponse.json();
+        
+        if (userResponse.ok && userData.id) {
+          const response = await fetch(`/api/timetable?userId=${userData.id}`);
+          const data = await response.json();
+          if (data.success) {
+            setTimetable({
+              weekdays: data.timetable.weekdays,
+              weekends: data.timetable.weekends
+            });
+          }
+        } else {
+          // Redirect to login if not authenticated
+          window.location.href = "/login";
         }
       } catch (error) {
         console.error('Error fetching timetable:', error);
@@ -156,13 +166,21 @@ const TimetableGenerator = () => {
 // In your TimetableGenerator component
 const saveTimetable = async (timetable) => {
   try {
+    // Get current user first
+    const userResponse = await fetch("/api/auth/User");
+    const userData = await userResponse.json();
+    
+    if (!userResponse.ok || !userData.id) {
+      throw new Error("User not authenticated");
+    }
+
     const response = await fetch('/api/timetable', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        userId: 1, // Replace with actual user ID
+        userId: userData.id,
         weekdays: timetable.weekdays,
         weekends: timetable.weekends,
         examMode: examMode // Include exam mode status
@@ -193,32 +211,69 @@ const saveTimetable = async (timetable) => {
   const generateTimetable = async () => {
     setLoading(true);
 
-    // Calculate total subject hours
-    const totalSubjectHours = subjects.reduce((sum, subject) => sum + subject.hours, 0);
+    try {
+      // Get current user
+      const userResponse = await fetch("/api/auth/User");
+      const userData = await userResponse.json();
+      
+      if (!userResponse.ok || !userData.id) {
+        throw new Error("User not authenticated");
+      }
 
-    // Calculate remaining hours for general study
-    const remainingHours = Math.max(0, weeklyStudyHours - totalSubjectHours);
+      // Prepare user preferences for ML
+      const userPreferences = {
+        wakeUpTime: weekdayWakeUp,
+        sleepTime: weekdaySleep,
+        collegeDays: collegeDays,
+        collegeStart: collegeStart,
+        collegeEnd: collegeEnd,
+        lunchTime: lunchTime,
+        dinnerTime: dinnerTime
+      };
 
-    // Generate weekday schedules
-    const weekdaySchedules = daysOfWeek
-      .filter(day => collegeDays.includes(day))
-      .map(day => generateDaySchedule(day, true, weekdayWakeUp, weekdaySleep));
+      // Use ML-powered timetable generation
+      const response = await fetch('/api/ml-timetable', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: userData.id,
+          subjects: subjects,
+          activities: activities,
+          userPreferences: userPreferences,
+          examMode: examMode,
+          useML: useML
+        })
+      });
 
-    // Generate weekend schedules
-    const weekendSchedules = daysOfWeek
-      .filter(day => !collegeDays.includes(day))
-      .map(day => generateDaySchedule(day, false, weekendWakeUp, weekendSleep));
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate timetable');
+      }
 
-    const newTimetable = {
-      weekdays: weekdaySchedules,
-      weekends: weekendSchedules
-    };
+      // Set the generated timetable
+      setTimetable({
+        weekdays: data.timetable.weekdays,
+        weekends: data.timetable.weekends
+      });
 
-    setTimetable(newTimetable);
-    setLoading(false);
+      // Show ML insights if available
+      if (data.insights) {
+        console.log('ML Insights:', data.insights);
+      }
 
-    // Save the timetable to the database
-    await saveTimetable(newTimetable);
+      if (data.recommendations) {
+        console.log('ML Recommendations:', data.recommendations);
+      }
+
+    } catch (error) {
+      console.error('Error generating ML timetable:', error);
+      alert('Failed to generate timetable: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Generate schedule for a single day
@@ -740,14 +795,37 @@ const saveTimetable = async (timetable) => {
             )}
           </div>
           
-          <div className="actions">
-            <button 
-              onClick={generateTimetable} 
-              disabled={loading}
-              className="generate-btn"
-            >
-              {loading ? "Generating..." : "Generate Weekly Timetable"}
-            </button>
+          <div className="section">
+            <h2>Generation Options</h2>
+            <div className="flex items-center space-x-4 mb-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={useML}
+                  onChange={(e) => setUseML(e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm">Use AI-Powered Optimization</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={examMode}
+                  onChange={(e) => setExamMode(e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm">Exam Mode (50% more study time)</span>
+              </label>
+            </div>
+            <div className="actions">
+              <button 
+                onClick={generateTimetable} 
+                disabled={loading}
+                className="generate-btn"
+              >
+                {loading ? "Generating..." : `Generate ${useML ? 'AI-Optimized' : 'Traditional'} Timetable`}
+              </button>
+            </div>
           </div>
           
           {timetable.weekdays.length > 0 && (

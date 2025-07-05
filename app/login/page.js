@@ -47,6 +47,10 @@ const Page = () => {
 
                 // Redirect to dashboard
                 router.push("/dashboard");
+            } else if (res.status === 404) {
+                setMessage("User not found. Please register first.");
+            } else if (res.status === 401) {
+                setMessage("Invalid password. Please try again.");
             } else {
                 setMessage(data.message || "Login failed. Please try again.");
             }
@@ -114,6 +118,15 @@ const Page = () => {
                     >
                         Log In
                     </button>
+                    
+                    <div className="mt-4 text-center">
+                        <p className="text-gray-600">
+                            Don't have an account?{" "}
+                            <Link href="/Register" className="text-blue-600 hover:text-blue-800 font-medium">
+                                Sign up here
+                            </Link>
+                        </p>
+                    </div>
                 </form>
             </div>
         </>

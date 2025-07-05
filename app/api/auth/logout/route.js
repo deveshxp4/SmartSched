@@ -1,6 +1,6 @@
 // app/api/auth/Logout/route.js
 
-import cookie from "cookie";
+import * as cookie from "cookie";
 
 export async function POST(req) {
   try {

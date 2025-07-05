@@ -98,6 +98,9 @@ export async function POST(request) {
         }
       });
     }
+
+    // Automatically update task stats for this date
+    await updateTaskStats(Number(userId), taskDate);
     
     return Response.json(
       { success: true, completion: result },
@@ -136,5 +139,62 @@ export async function DELETE(request) {
       { success: false, error: error.message || 'Database operation failed' },
       { status: 500 }
     );
+  }
+}
+
+// Helper function to update task stats for a specific date
+async function updateTaskStats(userId, date) {
+  try {
+    // Get all completions for this user and date
+    const completions = await prisma.taskCompletion.findMany({
+      where: {
+        user_id: userId,
+        date: {
+          gte: new Date(date.setHours(0, 0, 0, 0)),
+          lt: new Date(date.setHours(23, 59, 59, 999))
+        }
+      }
+    });
+
+    const totalTasks = completions.length;
+    const completedTasks = completions.filter(task => task.completed).length;
+    const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+    // Check if stats already exist for this date
+    const existingStats = await prisma.taskStats.findFirst({
+      where: {
+        user_id: userId,
+        date: {
+          gte: new Date(date.setHours(0, 0, 0, 0)),
+          lt: new Date(date.setHours(23, 59, 59, 999))
+        }
+      }
+    });
+
+    if (existingStats) {
+      // Update existing stats
+      await prisma.taskStats.update({
+        where: { id: existingStats.id },
+        data: {
+          total_tasks: totalTasks,
+          completed_tasks: completedTasks,
+          completion_rate: completionRate,
+          updated_at: new Date()
+        }
+      });
+    } else {
+      // Create new stats record
+      await prisma.taskStats.create({
+        data: {
+          user_id: userId,
+          date: date,
+          total_tasks: totalTasks,
+          completed_tasks: completedTasks,
+          completion_rate: completionRate
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error updating task stats:', error);
   }
 } 

@@ -1,12 +1,5 @@
 // app/api/chatbot-timetable/route.js
 
-import { Configuration, OpenAIApi } from "openai";
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-
 export async function POST(req) {
   try {
     const { prompt } = await req.json();
@@ -14,19 +7,36 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "Prompt is required." }), { status: 400 });
     }
 
-    const chatPrompt = `Generate a detailed daily timetable based on the following instructions: ${prompt}`;
+    // For now, return a mock response since OpenAI API key is not configured
+    const mockResponse = `Based on your request: "${prompt}", here's a suggested timetable:
 
-    const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: chatPrompt,
-      max_tokens: 250,
-      temperature: 0.7,
+Morning (8:00 AM - 12:00 PM):
+- 8:00-9:00: Breakfast and morning routine
+- 9:00-10:30: Study session
+- 10:30-11:00: Break
+- 11:00-12:00: Continue studying
+
+Afternoon (12:00 PM - 5:00 PM):
+- 12:00-1:00: Lunch break
+- 1:00-3:00: Focused work/study
+- 3:00-3:30: Short break
+- 3:30-5:00: Complete tasks
+
+Evening (5:00 PM - 10:00 PM):
+- 5:00-6:00: Exercise or relaxation
+- 6:00-7:00: Dinner
+- 7:00-9:00: Review and planning
+- 9:00-10:00: Wind down and prepare for bed`;
+
+    return new Response(JSON.stringify({ timetable: mockResponse }), { 
+      status: 200, 
+      headers: { "Content-Type": "application/json" } 
     });
-
-    const timetableText = completion.data.choices[0].text.trim();
-    return new Response(JSON.stringify({ timetable: timetableText }), { status: 200, headers: { "Content-Type": "application/json" } });
   } catch (error) {
-    console.error("Error from OpenAI:", error);
-    return new Response(JSON.stringify({ error: "Error generating timetable" }), { status: 500, headers: { "Content-Type": "application/json" } });
+    console.error("Error generating timetable:", error);
+    return new Response(JSON.stringify({ error: "Error generating timetable" }), { 
+      status: 500, 
+      headers: { "Content-Type": "application/json" } 
+    });
   }
 }

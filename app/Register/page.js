@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";  // Import useRouter from next/navigation
 import Link from "next/link";
-import style from "./Style.css";  // Import CSS module
+import "./Style.css";  // Import CSS file
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -38,8 +38,16 @@ const Signup = () => {
 
       if (res.status === 201) {
         // Success: Display success message and redirect
-        setMessage("Registration successful!");
-        router.push('/login');
+        setMessage("Registration successful! Please login.");
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      } else if (res.status === 409) {
+        // User already exists: Show message and redirect to login
+        setMessage("You are already registered! Please login instead.");
+        setTimeout(() => {
+          router.push('/login');
+        }, 3000);
       } else {
         // Error: Display the backend error message
         setMessage(data.message || "Something went wrong!");
@@ -182,6 +190,15 @@ const Signup = () => {
                 Already have an account? <span className="span">Login</span>
               </p>
             </Link>
+            
+            <div className="mt-4 text-center">
+                <p className="text-gray-600 text-sm">
+                    By signing up, you agree to our{" "}
+                    <a href="#" className="text-blue-600 hover:text-blue-800">Terms of Service</a>{" "}
+                    and{" "}
+                    <a href="#" className="text-blue-600 hover:text-blue-800">Privacy Policy</a>
+                </p>
+            </div>
             <div className="flex-row">
               <button className="btn google">
                 <svg

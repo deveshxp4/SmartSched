@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import ProductivityChart from "../components/ProductivityChart";
-import { Calendar, CheckSquare, Settings, LogOut, User, PieChart } from "lucide-react";
+import MLDashboard from "../components/MLDashboard";
+import { Calendar, CheckSquare, Settings, LogOut, User, PieChart, Brain } from "lucide-react";
 
 const Dashboard = () => {
   const [userName, setUserName] = useState(null);
@@ -20,7 +21,7 @@ const Dashboard = () => {
         const data = await response.json();
         console.log("User API response:", data);
         
-        if (response.ok) {
+        if (response.ok && data.id) {
           setUserName(data.name);
           setUserId(data.id);
           console.log("User authenticated:", data.name);
@@ -45,7 +46,7 @@ const Dashboard = () => {
           // Delayed redirect
           setTimeout(() => {
             window.location.href = "/login";
-          }, 5000);
+          }, 3000);
         }
       } catch (error) {
         console.error("Error in dashboard:", error);
@@ -53,7 +54,7 @@ const Dashboard = () => {
         // Delayed redirect
         setTimeout(() => {
           window.location.href = "/login";
-        }, 5000);
+        }, 3000);
       } finally {
         setLoading(false);
       }
@@ -62,7 +63,21 @@ const Dashboard = () => {
     fetchUser();
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      // Call the logout API to clear server-side session
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
+    // Clear client-side storage
+    localStorage.removeItem("isLoggedIn");
     Cookies.remove("user_session");
     window.location.href = "/login";
   };
@@ -133,6 +148,11 @@ const Dashboard = () => {
                 <Settings size={20} />
                 <span className="font-medium">Generate Timetable</span>
               </Link>
+              
+              <Link href="/timetableChatbot" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition">
+                <Brain size={20} />
+                <span className="font-medium">AI Assistant</span>
+              </Link>
             </nav>
           </div>
           
@@ -155,7 +175,7 @@ const Dashboard = () => {
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Overview</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-blue-50 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -183,6 +203,16 @@ const Dashboard = () => {
                       <p className="text-lg font-semibold">Active</p>
                     </div>
                     <User className="text-purple-600" size={24} />
+                  </div>
+                </div>
+                
+                <div className="bg-orange-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-orange-600">AI Insights</p>
+                      <p className="text-lg font-semibold">Available</p>
+                    </div>
+                    <Brain className="text-orange-600" size={24} />
                   </div>
                 </div>
               </div>
@@ -217,6 +247,13 @@ const Dashboard = () => {
                     Get Started
                   </button>
                 </Link>
+              </div>
+            )}
+            
+            {/* ML-Powered Analytics Dashboard */}
+            {userId && (
+              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <MLDashboard userId={userId} />
               </div>
             )}
             
