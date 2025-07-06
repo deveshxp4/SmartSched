@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 import Link from "next/link";
 import ProductivityChart from "../components/ProductivityChart";
 import MLDashboard from "../components/MLDashboard";
-import { Calendar, CheckSquare, Settings, LogOut, User, PieChart, Brain } from "lucide-react";
+import { Calendar, CheckSquare, Settings, LogOut, User, PieChart, Brain, Menu, X } from "lucide-react";
 
 const Dashboard = () => {
   const [userName, setUserName] = useState(null);
@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [timetable, setTimetable] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -94,7 +95,7 @@ const Dashboard = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
           <div className="text-red-500 mb-4 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -110,8 +111,28 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-gray-800">Productivity</h1>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-10">
+      <div className={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200">
             <h1 className="text-2xl font-bold text-gray-800">Productivity</h1>
@@ -134,22 +155,38 @@ const Dashboard = () => {
                 <span className="font-medium">Dashboard</span>
               </a>
               
-              <Link href="/my-timetable" className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition ${!timetable && 'opacity-50 pointer-events-none'}`}>
+              <Link 
+                href="/my-timetable" 
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition ${!timetable && 'opacity-50 pointer-events-none'}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 <Calendar size={20} />
                 <span className="font-medium">My Timetable</span>
               </Link>
               
-              <Link href="/daily-timetable" className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition ${!timetable && 'opacity-50 pointer-events-none'}`}>
+              <Link 
+                href="/daily-timetable" 
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition ${!timetable && 'opacity-50 pointer-events-none'}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 <CheckSquare size={20} />
                 <span className="font-medium">Daily Tasks</span>
               </Link>
               
-              <Link href="/timetable" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition">
+              <Link 
+                href="/timetable" 
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 <Settings size={20} />
                 <span className="font-medium">Generate Timetable</span>
               </Link>
               
-              <Link href="/timetableChatbot" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition">
+              <Link 
+                href="/timetableChatbot" 
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 <Brain size={20} />
                 <span className="font-medium">AI Assistant</span>
               </Link>
@@ -169,13 +206,13 @@ const Dashboard = () => {
       </div>
       
       {/* Main content */}
-      <div className="ml-64 p-8">
+      <div className="lg:ml-64 p-4 md:p-8">
         {userName && (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Overview</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-blue-50 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -219,8 +256,8 @@ const Dashboard = () => {
             </div>
             
             {timetable ? (
-              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
+              <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
                   <h2 className="text-xl font-bold text-gray-800">Productivity Overview</h2>
                   <select className="bg-gray-100 border-0 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>Last 14 days</option>
@@ -234,7 +271,7 @@ const Dashboard = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm p-6 mb-6 text-center">
+              <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-6 text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
                   <Calendar className="text-blue-600" size={28} />
                 </div>
@@ -252,13 +289,13 @@ const Dashboard = () => {
             
             {/* ML-Powered Analytics Dashboard */}
             {userId && (
-              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-6">
                 <MLDashboard userId={userId} />
               </div>
             )}
             
             {timetable && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Productivity Tips</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-50 rounded-lg p-4">

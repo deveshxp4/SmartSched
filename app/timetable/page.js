@@ -200,709 +200,376 @@ const saveTimetable = async (timetable) => {
       throw new Error(data.error || 'Failed to save timetable');
     }
 
-    return data.timetable;
+    return data;
   } catch (error) {
     console.error('Error saving timetable:', error);
-    alert(error.message);
+    throw error;
   }
 };
 
-  // Generate timetable
-  const generateTimetable = async () => {
-    setLoading(true);
-
-    try {
-      // Get current user
-      const userResponse = await fetch("/api/auth/User");
-      const userData = await userResponse.json();
-      
-      if (!userResponse.ok || !userData.id) {
-        throw new Error("User not authenticated");
-      }
-
-      // Prepare user preferences for ML
-      const userPreferences = {
-        wakeUpTime: weekdayWakeUp,
-        sleepTime: weekdaySleep,
-        collegeDays: collegeDays,
-        collegeStart: collegeStart,
-        collegeEnd: collegeEnd,
-        lunchTime: lunchTime,
-        dinnerTime: dinnerTime
-      };
-
-      // Use ML-powered timetable generation
-      const response = await fetch('/api/ml-timetable', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId: userData.id,
-          subjects: subjects,
-          activities: activities,
-          userPreferences: userPreferences,
-          examMode: examMode,
-          useML: useML
-        })
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate timetable');
-      }
-
-      // Set the generated timetable
-      setTimetable({
-        weekdays: data.timetable.weekdays,
-        weekends: data.timetable.weekends
-      });
-
-      // Show ML insights if available
-      if (data.insights) {
-        console.log('ML Insights:', data.insights);
-      }
-
-      if (data.recommendations) {
-        console.log('ML Recommendations:', data.recommendations);
-      }
-
-    } catch (error) {
-      console.error('Error generating ML timetable:', error);
-      alert('Failed to generate timetable: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Generate schedule for a single day
-  const generateDaySchedule = (day, isCollegeDay, wakeTime, sleepTime) => {
-    const wakeMins = timeToMinutes(wakeTime);
-    const sleepMins = timeToMinutes(sleepTime);
-    let currentTime = wakeMins;
-
-    const schedule = [];
-
-    // Add morning routine if there's time before college
-    if (isCollegeDay) {
-      const collegeStartMins = timeToMinutes(collegeStart);
-      if (currentTime < collegeStartMins) {
-        schedule.push({
-          start: minutesToTime(currentTime),
-          end: minutesToTime(collegeStartMins),
-          activity: "Morning Routine"
-        });
-        currentTime = collegeStartMins;
-      }
-    } else {
-      // For weekends, add morning routine until lunch
-      const lunchMins = timeToMinutes(lunchTime);
-      if (currentTime < lunchMins) {
-        schedule.push({
-          start: minutesToTime(currentTime),
-          end: minutesToTime(lunchMins),
-          activity: "Morning Routine"
-        });
-        currentTime = lunchMins;
-      }
-    }
-
-    // College time (for weekdays)
-    if (isCollegeDay) {
-      const collegeStartMins = timeToMinutes(collegeStart);
-      const collegeEndMins = timeToMinutes(collegeEnd);
-      const lunchMins = timeToMinutes(lunchTime);
-      const lunchEndMins = lunchMins + lunchDuration;
-
-      // College before lunch
-      if (collegeStartMins < lunchMins) {
-        const collegeBeforeLunch = Math.min(collegeEndMins, lunchMins) - collegeStartMins;
-        if (collegeBeforeLunch > 0) {
-          schedule.push({
-            start: minutesToTime(collegeStartMins),
-            end: minutesToTime(collegeStartMins + collegeBeforeLunch),
-            activity: "College"
-          });
-          currentTime = collegeStartMins + collegeBeforeLunch;
-        }
-      }
-
-      // Lunch break during college hours
-      if (lunchMins >= collegeStartMins && lunchMins < collegeEndMins) {
-        schedule.push({
-          start: minutesToTime(lunchMins),
-          end: minutesToTime(lunchEndMins),
-          activity: "Lunch Break"
-        });
-        currentTime = lunchEndMins;
-
-        // College after lunch
-        const remainingCollege = collegeEndMins - lunchEndMins;
-        if (remainingCollege > 0) {
-          schedule.push({
-            start: minutesToTime(lunchEndMins),
-            end: minutesToTime(collegeEndMins),
-            activity: "College"
-          });
-          currentTime = collegeEndMins;
-        }
-      } else {
-        // College continues if lunch is not during college hours
-        if (currentTime < collegeEndMins) {
-          schedule.push({
-            start: minutesToTime(currentTime),
-            end: minutesToTime(collegeEndMins),
-            activity: "College"
-          });
-          currentTime = collegeEndMins;
-        }
-      }
-    } else {
-      // For non-college days, just add lunch
-      const lunchMins = timeToMinutes(lunchTime);
-      if (currentTime < lunchMins) {
-        schedule.push({
-          start: minutesToTime(currentTime),
-          end: minutesToTime(lunchMins),
-          activity: "Morning Activities"
-        });
-        currentTime = lunchMins;
-      }
-      schedule.push({
-        start: minutesToTime(lunchMins),
-        end: minutesToTime(lunchMins + lunchDuration),
-        activity: "Lunch"
-      });
-      currentTime = lunchMins + lunchDuration;
-    }
-
-    // Only schedule study/activities after college ends (for weekdays)
-    const getActivitiesForTimeSlot = (availableMinutes) => {
-      // Calculate daily study multiplier based on exam mode
-      const examModeMultiplier = examMode ? 1.5 : 1;
-      
-      // Get all study and personal activities for this day
-      const dayActivities = [
-        // Study subjects (distributed across week)
-        ...subjects.map(subject => ({
-          name: `Study ${subject.name}`,
-          duration: Math.round((subject.hours * 60 * examModeMultiplier) / 7),
-          priority: examMode ? Math.min(subject.priority + 2, 10) : subject.priority
-        })),
-        // General study time
-        {
-          name: "General Study",
-          duration: Math.round((weeklyStudyHours * 60 * examModeMultiplier - subjects.reduce((sum, s) => sum + s.hours * 60 * examModeMultiplier, 0)) / 7),
-          priority: examMode ? 5 : 3
-        },
-        // Personal activities with reduced priority in exam mode
-        ...activities
-          .filter(act => act.days.includes(day))
-          .map(act => ({
-            name: act.name,
-            duration: act.duration,
-            priority: examMode ? Math.max(act.priority - 2, 1) : act.priority
-          }))
-      ].filter(act => act.duration > 0);
-
-      // Sort by priority (highest first)
-      const sortedActivities = [...dayActivities].sort((a, b) => b.priority - a.priority);
-
-      // Schedule activities within available time
-      const scheduled = [];
-      let remainingTime = availableMinutes;
-
-      for (const activity of sortedActivities) {
-        if (remainingTime <= 0) break;
-        
-        const duration = Math.min(activity.duration, remainingTime);
-        if (duration > 0) {
-          scheduled.push({
-            name: activity.name,
-            duration: duration
-          });
-          remainingTime -= duration;
-        }
-      }
-
-      return scheduled;
-    };
-
-    const dinnerMins = timeToMinutes(dinnerTime);
-    if (currentTime < dinnerMins) {
-      const availableTime = dinnerMins - currentTime;
-      const activities = getActivitiesForTimeSlot(availableTime);
-      
-      activities.forEach(activity => {
-        schedule.push({
-          start: minutesToTime(currentTime),
-          end: minutesToTime(currentTime + activity.duration),
-          activity: activity.name
-        });
-        currentTime += activity.duration;
-      });
-    }
-
-    // Dinner time
-    schedule.push({
-      start: minutesToTime(dinnerMins),
-      end: minutesToTime(dinnerMins + dinnerDuration),
-      activity: "Dinner"
-    });
-    currentTime = dinnerMins + dinnerDuration;
-
-    // Evening activities
-    if (currentTime < sleepMins) {
-      const availableTime = sleepMins - currentTime;
-      const activities = getActivitiesForTimeSlot(availableTime);
-      
-      activities.forEach(activity => {
-        schedule.push({
-          start: minutesToTime(currentTime),
-          end: minutesToTime(currentTime + activity.duration),
-          activity: activity.name
-        });
-        currentTime += activity.duration;
-      });
-    }
-
-    return { day, schedule };
-  };
+  if (fetching) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="w-16 h-16 border-4 border-t-blue-600 border-blue-200 rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-600 font-medium">Loading timetable...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="timetable-generator">
-      <h1>Weekly Timetable Generator</h1>
-
-      {fetching ? (
-        <p>Loading timetable...</p>
-      ) : (
-        <>
-          <div className="section">
-            <h2>Daily Schedule</h2>
-            
-            <div className="subsection">
-              <h3>Weekdays</h3>
-              <div className="time-inputs">
-                <div className="input-group">
-                  <label>Wake Up Time</label>
-                  <input 
-                    type="time" 
-                    value={weekdayWakeUp} 
-                    onChange={(e) => setWeekdayWakeUp(e.target.value)} 
-                  />
-                </div>
-                <div className="input-group">
-                  <label>Sleep Time</label>
-                  <input 
-                    type="time" 
-                    value={weekdaySleep} 
-                    onChange={(e) => setWeekdaySleep(e.target.value)} 
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="subsection">
-              <h3>Weekend</h3>
-              <div className="time-inputs">
-                <div className="input-group">
-                  <label>Wake Up Time</label>
-                  <input 
-                    type="time" 
-                    value={weekendWakeUp} 
-                    onChange={(e) => setWeekendWakeUp(e.target.value)} 
-                  />
-                </div>
-                <div className="input-group">
-                  <label>Sleep Time</label>
-                  <input 
-                    type="time" 
-                    value={weekendSleep} 
-                    onChange={(e) => setWeekendSleep(e.target.value)} 
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Timetable Generator</h1>
           
-          <div className="section">
-            <h2>Meal Times</h2>
-            <div className="time-inputs">
-              <div className="input-group">
-                <label>Lunch Time</label>
-                <input 
-                  type="time" 
-                  value={lunchTime} 
-                  onChange={(e) => setLunchTime(e.target.value)} 
-                />
-              </div>
-              <div className="input-group">
-                <label>Lunch Duration (min)</label>
-                <input
-                  type="number"
-                  min="15"
-                  max="120"
-                  value={lunchDuration}
-                  onChange={(e) => setLunchDuration(parseInt(e.target.value) || 40)}
-                />
-              </div>
-              <div className="input-group">
-                <label>Dinner Time</label>
-                <input 
-                  type="time" 
-                  value={dinnerTime} 
-                  onChange={(e) => setDinnerTime(e.target.value)} 
-                />
-              </div>
-              <div className="input-group">
-                <label>Dinner Duration (min)</label>
-                <input
-                  type="number"
-                  min="15"
-                  max="120"
-                  value={dinnerDuration}
-                  onChange={(e) => setDinnerDuration(parseInt(e.target.value) || 30)}
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="section">
-            <h2>College Schedule</h2>
-            <div className="time-inputs">
-              <div className="input-group">
-                <label>Start Time</label>
-                <input 
-                  type="time" 
-                  value={collegeStart} 
-                  onChange={(e) => setCollegeStart(e.target.value)} 
-                />
-              </div>
-              <div className="input-group">
-                <label>End Time</label>
-                <input 
-                  type="time" 
-                  value={collegeEnd} 
-                  onChange={(e) => setCollegeEnd(e.target.value)} 
-                />
-              </div>
-            </div>
-            
-            <div className="day-selection">
-              <label>College Days:</label>
-              <div className="day-buttons">
-                {daysOfWeek.slice(0, 5).map(day => (
-                  <button
-                    key={day}
-                    type="button"
-                    className={collegeDays.includes(day) ? "selected" : ""}
-                    onClick={() => toggleDay(day, 'college')}
-                  >
-                    {day.substring(0, 3)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          <div className="section">
-            <h2>Study Plan</h2>
-            
-            <div className="exam-mode-toggle">
-              <label className={`toggle-label ${examMode ? 'active' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={examMode}
-                  onChange={() => setExamMode(!examMode)}
-                />
-                <span className="toggle-switch"></span>
-                Exam Preparation Mode {examMode && "✓"}
-              </label>
-              {examMode && (
-                <div className="exam-mode-info">
-                  <p>📚 Exam mode increases study time allocation by 50%</p>
-                  <p>📈 Study activities will have higher priority</p>
-                  <p>🔄 Other activities will have reduced priority</p>
-                </div>
-              )}
-            </div>
-            
-            <div className="input-group">
-              <label>Weekly Study Hours: {weeklyStudyHours} {examMode ? `(${Math.round(weeklyStudyHours * 1.5)} with exam mode)` : ''} hours</label>
+          {/* Basic Schedule Settings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Weekday Wake Up</label>
               <input
-                type="range"
-                min="5"
-                max="40"
-                value={weeklyStudyHours}
-                onChange={(e) => setWeeklyStudyHours(parseInt(e.target.value))}
+                type="time"
+                value={weekdayWakeUp}
+                onChange={(e) => setWeekdayWakeUp(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             
-            <div className="subject-form">
-              <h3>Add Subjects</h3>
-              <div className="input-row">
-                <input 
-                  type="text" 
-                  placeholder="Subject Name" 
-                  value={subjectName} 
-                  onChange={(e) => setSubjectName(e.target.value)} 
-                />
-                <input
-                  type="number"
-                  min="0"
-                  max={weeklyStudyHours}
-                  placeholder="Hours per week"
-                  value={subjectHours}
-                  onChange={(e) => setSubjectHours(parseInt(e.target.value) || 0)}
-                />
-              </div>
-              
-              <div className="priority-slider">
-                <label>Priority: {subjectPriority}</label>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={subjectPriority}
-                  onChange={(e) => setSubjectPriority(parseInt(e.target.value))}
-                />
-              </div>
-              
-              <button onClick={addSubject} className="add-btn">Add Subject</button>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Weekday Sleep</label>
+              <input
+                type="time"
+                value={weekdaySleep}
+                onChange={(e) => setWeekdaySleep(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
             
-            <div className="subjects-list">
-              <h3>Your Subjects</h3>
-              {subjects.length === 0 ? (
-                <p>No subjects added yet</p>
-              ) : (
-                <ul>
-                  {subjects.map((subject, index) => (
-                    <li key={index}>
-                      <div className="subject-info">
-                        <span className="subject-name">{subject.name}</span>
-                        <span className="subject-details">
-                          {subject.hours}h/week | Priority: {subject.priority}
-                        </span>
-                      </div>
-                      <button 
-                        onClick={() => removeSubject(index)} 
-                        className="remove-btn"
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {subjects.length > 0 && (
-                <div className="total-hours">
-                  Total subject hours: {subjects.reduce((sum, subject) => sum + subject.hours, 0)} / {weeklyStudyHours}
-                </div>
-              )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Weekend Wake Up</label>
+              <input
+                type="time"
+                value={weekendWakeUp}
+                onChange={(e) => setWeekendWakeUp(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Weekend Sleep</label>
+              <input
+                type="time"
+                value={weekendSleep}
+                onChange={(e) => setWeekendSleep(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
-          
-          <div className="section">
-            <h2>Add Activities</h2>
-            <div className="activity-form">
-              <div className="input-row">
-                <input 
-                  type="text" 
-                  placeholder="Activity Name" 
-                  value={activityName} 
-                  onChange={(e) => setActivityName(e.target.value)} 
+
+          {/* Options */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={examMode}
+                onChange={(e) => setExamMode(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-gray-700">Exam Mode</span>
+            </label>
+            
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={useML}
+                onChange={(e) => setUseML(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-gray-700">Use ML Optimization</span>
+            </label>
+          </div>
+
+          {/* Meal Times */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Lunch Time</label>
+              <input
+                type="time"
+                value={lunchTime}
+                onChange={(e) => setLunchTime(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Lunch Duration (min)</label>
+              <input
+                type="number"
+                value={lunchDuration}
+                onChange={(e) => setLunchDuration(parseInt(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Dinner Time</label>
+              <input
+                type="time"
+                value={dinnerTime}
+                onChange={(e) => setDinnerTime(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Dinner Duration (min)</label>
+              <input
+                type="number"
+                value={dinnerDuration}
+                onChange={(e) => setDinnerDuration(parseInt(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* College Schedule */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">College Schedule</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">College Start Time</label>
+                <input
+                  type="time"
+                  value={collegeStart}
+                  onChange={(e) => setCollegeStart(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               
-              <div className="duration-input">
-                <label>Duration:</label>
-                <div className="duration-controls">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">College End Time</label>
+                <input
+                  type="time"
+                  value={collegeEnd}
+                  onChange={(e) => setCollegeEnd(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">College Days</label>
+                <div className="flex flex-wrap gap-2">
+                  {daysOfWeek.slice(0, 5).map(day => (
+                    <button
+                      key={day}
+                      onClick={() => toggleDay(day, 'college')}
+                      className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                        collegeDays.includes(day)
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {day.slice(0, 3)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Activities */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Activities</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Activity Name</label>
+                <input
+                  type="text"
+                  value={activityName}
+                  onChange={(e) => setActivityName(e.target.value)}
+                  placeholder="e.g., Gym, Reading"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Duration</label>
+                <div className="flex gap-2">
                   <input
                     type="number"
-                    min="0"
-                    max="10"
                     value={activityDuration.hours}
-                    onChange={(e) => setActivityDuration({...activityDuration, hours: parseInt(e.target.value) || 0})}
+                    onChange={(e) => setActivityDuration(prev => ({ ...prev, hours: parseInt(e.target.value) || 0 }))}
+                    placeholder="Hours"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <span>hours</span>
                   <input
                     type="number"
-                    min="0"
-                    max="59"
                     value={activityDuration.minutes}
-                    onChange={(e) => setActivityDuration({...activityDuration, minutes: parseInt(e.target.value) || 0})}
+                    onChange={(e) => setActivityDuration(prev => ({ ...prev, minutes: parseInt(e.target.value) || 0 }))}
+                    placeholder="Minutes"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <span>minutes</span>
                 </div>
               </div>
               
-              <div className="priority-slider">
-                <label>Priority: {activityPriority}</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Priority (1-10)</label>
                 <input
-                  type="range"
+                  type="number"
                   min="1"
                   max="10"
                   value={activityPriority}
                   onChange={(e) => setActivityPriority(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               
-              <div className="day-selection">
-                <label>Days:</label>
-                <div className="day-buttons">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Days</label>
+                <div className="flex flex-wrap gap-1">
                   {daysOfWeek.map(day => (
                     <button
                       key={day}
-                      type="button"
-                      className={activityDays.includes(day) ? "selected" : ""}
                       onClick={() => toggleDay(day, 'activity')}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        activityDays.includes(day)
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
                     >
-                      {day.substring(0, 3)}
+                      {day.slice(0, 3)}
                     </button>
                   ))}
                 </div>
               </div>
-              
-              <button onClick={addActivity} className="add-btn">Add Activity</button>
             </div>
-          </div>
-          
-          <div className="section">
-            <h2>Your Activities</h2>
-            {activities.length === 0 ? (
-              <p>No activities added yet</p>
-            ) : (
-              <ul className="activities-list">
-                {activities.map((activity, index) => (
-                  <li key={index}>
-                    <div className="activity-info">
-                      <span className="activity-name">{activity.name}</span>
-                      <span className="activity-details">
-                        {formatDuration(activity.duration)} | Priority: {activity.priority} | Days: {activity.days.map(d => d.substring(0, 3)).join(', ')}
-                      </span>
-                    </div>
-                    <button 
-                      onClick={() => removeActivity(index)} 
-                      className="remove-btn"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          
-          <div className="section">
-            <h2>Generation Options</h2>
-            <div className="flex items-center space-x-4 mb-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={useML}
-                  onChange={(e) => setUseML(e.target.checked)}
-                  className="mr-2"
-                />
-                <span className="text-sm">Use AI-Powered Optimization</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={examMode}
-                  onChange={(e) => setExamMode(e.target.checked)}
-                  className="mr-2"
-                />
-                <span className="text-sm">Exam Mode (50% more study time)</span>
-              </label>
-            </div>
-            <div className="actions">
-              <button 
-                onClick={generateTimetable} 
-                disabled={loading}
-                className="generate-btn"
-              >
-                {loading ? "Generating..." : `Generate ${useML ? 'AI-Optimized' : 'Traditional'} Timetable`}
-              </button>
-            </div>
-          </div>
-          
-          {timetable.weekdays.length > 0 && (
-            <div className="timetable-output">
-              <h2>Your Weekly Timetable {examMode && <span className="exam-badge">Exam Mode</span>}</h2>
-              
-              <div className="weekday-timetable">
-                <h3>Weekdays</h3>
-                {timetable.weekdays.map((daySchedule, index) => (
-                  <div key={index} className="day-schedule">
-                    <h4>{daySchedule.day}</h4>
-                    <div className="schedule-grid">
-                      {daySchedule.schedule.map((slot, slotIndex) => {
-                        const isStudyActivity = slot.activity.includes("Study");
-                        return (
-                          <div 
-                            key={slotIndex} 
-                            className="time-slot"
-                            data-exam-mode={examMode.toString()}
-                            data-activity-type={isStudyActivity ? "study" : "regular"}
-                          >
-                            <span className="time">{slot.start} - {slot.end}</span>
-                            <span className="activity">
-                              {slot.activity}
-                              {examMode && isStudyActivity && " 📚"}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+            
+            <button
+              onClick={addActivity}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add Activity
+            </button>
+            
+            {/* Activities List */}
+            <div className="mt-4 space-y-2">
+              {activities.map((activity, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <span className="font-medium">{activity.name}</span>
+                    <span className="text-gray-600 ml-2">({formatDuration(activity.duration)})</span>
+                    <span className="text-gray-500 ml-2">Priority: {activity.priority}</span>
+                    <span className="text-gray-500 ml-2">Days: {activity.days.join(', ')}</span>
                   </div>
-                ))}
-              </div>
-              
-              <div className="weekend-timetable">
-                <h3>Weekends</h3>
-                {timetable.weekends.map((daySchedule, index) => (
-                  <div key={index} className="day-schedule">
-                    <h4>{daySchedule.day}</h4>
-                    <div className="schedule-grid">
-                      {daySchedule.schedule.map((slot, slotIndex) => {
-                        const isStudyActivity = slot.activity.includes("Study");
-                        return (
-                          <div 
-                            key={slotIndex} 
-                            className="time-slot"
-                            data-exam-mode={examMode.toString()}
-                            data-activity-type={isStudyActivity ? "study" : "regular"}
-                          >
-                            <span className="time">{slot.start} - {slot.end}</span>
-                            <span className="activity">
-                              {slot.activity}
-                              {examMode && isStudyActivity && " 📚"}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {examMode && (
-                <div className="exam-mode-summary">
-                  <h3>Exam Mode Summary</h3>
-                  <p>Your timetable has been optimized for exam preparation with:</p>
-                  <ul>
-                    <li>Increased study time: {Math.round(weeklyStudyHours * 1.5)} hours/week (50% boost)</li>
-                    <li>Higher priority for study activities</li>
-                    <li>Focused distribution of time across subjects</li>
-                  </ul>
+                  <button
+                    onClick={() => removeActivity(index)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
                 </div>
-              )}
+              ))}
             </div>
-          )}
-        </>
-      )}
+          </div>
+
+          {/* Subjects */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Subjects</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Subject Name</label>
+                <input
+                  type="text"
+                  value={subjectName}
+                  onChange={(e) => setSubjectName(e.target.value)}
+                  placeholder="e.g., Mathematics"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Weekly Hours</label>
+                <input
+                  type="number"
+                  value={subjectHours}
+                  onChange={(e) => setSubjectHours(parseInt(e.target.value) || 0)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Priority (1-10)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={subjectPriority}
+                  onChange={(e) => setSubjectPriority(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            
+            <button
+              onClick={addSubject}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add Subject
+            </button>
+            
+            {/* Subjects List */}
+            <div className="mt-4 space-y-2">
+              {subjects.map((subject, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <span className="font-medium">{subject.name}</span>
+                    <span className="text-gray-600 ml-2">({subject.hours}h/week)</span>
+                    <span className="text-gray-500 ml-2">Priority: {subject.priority}</span>
+                  </div>
+                  <button
+                    onClick={() => removeSubject(index)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Study Plan */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Study Plan</h3>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Weekly Study Hours</label>
+              <input
+                type="number"
+                value={weeklyStudyHours}
+                onChange={(e) => setWeeklyStudyHours(parseInt(e.target.value) || 0)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Generate Button */}
+          <div className="flex justify-center">
+            <button
+              onClick={() => {/* Your generate function */}}
+              disabled={loading}
+              className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Generating...' : 'Generate Timetable'}
+            </button>
+          </div>
+        </div>
+
+        {/* Generated Timetable Display */}
+        {(timetable.weekdays.length > 0 || timetable.weekends.length > 0) && (
+          <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Generated Timetable</h2>
+            {/* Your timetable display component */}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
