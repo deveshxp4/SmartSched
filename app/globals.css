@@ -17,6 +17,300 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100% !important;
+}
+
+/* Override old CSS styles that break mobile layout */
+@media (max-width: 768px) {
+  /* Override fixed widths and margins from style.css */
+  .right {
+    display: flex;
+    justify-content: center !important;
+    margin-left: 0 !important;
+  }
+  
+  .bok {
+    width: 100% !important;
+    max-width: 400px !important;
+    margin-right: 0 !important;
+  }
+  
+  .top {
+    margin-left: 0 !important;
+  }
+  
+  .main2 {
+    margin-left: 0 !important;
+    font-size: 2rem !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  .main3 {
+    margin-left: 0 !important;
+    margin-top: 1rem !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  .main4 {
+    margin-top: 0.5rem !important;
+    margin-left: 0 !important;
+  }
+  
+  .main5 {
+    margin-top: 1rem !important;
+    margin-left: 0 !important;
+    justify-content: center !important;
+  }
+  
+  .main6 {
+    width: 24px !important;
+    height: auto !important;
+  }
+  
+  .main8 {
+    margin-top: 2rem !important;
+    width: 100% !important;
+    height: auto !important;
+    z-index: auto !important;
+  }
+  
+  .tutu {
+    margin-top: 1rem !important;
+    margin-left: 0 !important;
+    font-size: 1.5rem !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  .right1 {
+    margin-left: 0 !important;
+    width: 100% !important;
+    margin-top: 1rem !important;
+  }
+  
+  .main10 {
+    font-size: 1.5rem !important;
+    margin-left: 0 !important;
+    text-align: center !important;
+  }
+  
+  .main11 {
+    margin-top: 1rem !important;
+    margin-left: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  .main12 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    gap: 1rem !important;
+    flex-direction: column !important;
+  }
+  
+  .main14 {
+    margin-left: 0 !important;
+    margin-top: 1rem !important;
+    width: 100% !important;
+  }
+  
+  .main20 {
+    width: 100% !important;
+    max-width: 400px !important;
+    height: auto !important;
+  }
+  
+  .right3 {
+    display: flex;
+    justify-content: center !important;
+  }
+  
+  .main21 {
+    width: 100% !important;
+  }
+  
+  .main22 {
+    margin-top: 2rem !important;
+    margin-left: 0 !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .main30, .main31 {
+    width: 100% !important;
+    max-width: 300px !important;
+    height: auto !important;
+    margin-top: 0 !important;
+  }
+  
+  .main32 {
+    width: 100% !important;
+    height: auto !important;
+    margin-top: 2rem !important;
+    padding-top: 2rem !important;
+  }
+  
+  .card {
+    max-width: 100% !important;
+    margin-top: 1rem !important;
+  }
+  
+  .main34 {
+    margin-top: 1rem !important;
+    margin-right: 0 !important;
+  }
+  
+  .main35 {
+    margin-top: 2rem !important;
+    margin-left: 0 !important;
+    text-align: center !important;
+  }
+  
+  .main37 {
+    width: 100% !important;
+  }
+  
+  .name1 {
+    flex-direction: column !important;
+    gap: 2rem !important;
+    height: auto !important;
+    margin-top: 2rem !important;
+  }
+  
+  .main41 {
+    font-size: 1.5rem !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .main50 {
+    width: 100% !important;
+    max-width: 400px !important;
+    height: auto !important;
+  }
+  
+  /* Login/Register page specific fixes */
+  .main100 {
+    margin-left: 0 !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+    padding: 1rem !important;
+  }
+  
+  .main266 {
+    width: 100% !important;
+    max-width: 400px !important;
+    height: auto !important;
+    margin-top: 0 !important;
+  }
+  
+  .form {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1.5rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .form1 {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1.5rem !important;
+  }
+  
+  .inputForm {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+  
+  .input {
+    width: 100% !important;
+    font-size: 16px !important;
+  }
+  
+  .imagewe {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Register page specific fixes */
+  .container {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-bottom: 2rem !important;
+    padding: 1rem !important;
+  }
+  
+  .rom {
+    width: 100% !important;
+    max-width: 400px !important;
+    height: auto !important;
+    margin-left: 0 !important;
+  }
+  
+  .inputform {
+    padding: 0.5rem !important;
+    margin: 0.5rem 0 !important;
+  }
+  
+  /* Change password page specific fixes */
+  .main45 {
+    margin-top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    z-index: auto !important;
+  }
+  
+  /* Fix container issues */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 100%;
+  }
+  
+  /* Ensure images don't overflow */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Fix flex layouts on mobile */
+  .flex {
+    flex-wrap: wrap;
+  }
+  
+  /* Better form layouts */
+  .form, .form1 {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1rem !important;
+  }
+  
+  /* Fix input containers */
+  .inputForm {
+    width: 100% !important;
+  }
+  
+  .input {
+    width: 100% !important;
+    font-size: 16px !important;
+  }
+  
+  /* Fix input container styles */
+  .input-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .input-container input {
+    width: 100% !important;
+    font-size: 16px !important;
+  }
 }
 
 /* Mobile-specific improvements */
@@ -71,12 +365,97 @@ body {
     font-size: 1.125rem;
     line-height: 1.75rem;
   }
+  
+  /* Fix container overflow issues */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 100%;
+  }
+  
+  /* Ensure images don't overflow */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Fix flex layouts on mobile */
+  .flex {
+    flex-wrap: wrap;
+  }
+  
+  /* Better form layouts */
+  .form, .form1 {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1rem !important;
+  }
+  
+  /* Fix input containers */
+  .inputForm {
+    width: 100% !important;
+  }
+  
+  .input {
+    width: 100% !important;
+    font-size: 16px !important;
+  }
 }
 
 /* Tablet improvements */
 @media (min-width: 769px) and (max-width: 1024px) {
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  /* Override some desktop styles for tablet */
+  .main2 {
+    font-size: 2.5rem !important;
+    width: 100% !important;
+  }
+  
+  .main3 {
+    width: 100% !important;
+  }
+  
+  .right1 {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Login/Register tablet fixes */
+  .main100 {
+    margin-left: 0 !important;
+    gap: 2rem !important;
+  }
+  
+  .main266 {
+    width: 100% !important;
+    max-width: 500px !important;
+  }
+  
+  .form, .form1 {
+    width: 100% !important;
+    max-width: 500px !important;
+  }
+  
+  /* Register tablet fixes */
+  .container {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .rom {
+    width: 100% !important;
+    max-width: 500px !important;
+    margin-left: 0 !important;
+  }
+  
+  /* Change password tablet fixes */
+  .main45 {
+    margin-top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
   }
 }
 
