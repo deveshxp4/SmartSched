@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { Calendar, CheckSquare, Settings, LogOut, User, PieChart } from "lucide-react";
 
 const MyTimetable = () => {
   const [userName, setUserName] = useState(null);
@@ -10,6 +11,7 @@ const MyTimetable = () => {
   const [activeView, setActiveView] = useState("week");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentWeekStart, setCurrentWeekStart] = useState(getWeekStartDate(new Date()));
+
 
   // Helper function to get the start date of a week (Monday)
   function getWeekStartDate(date) {
@@ -21,18 +23,18 @@ const MyTimetable = () => {
 
   // Helper function to format date for display
   function formatDate(date) {
-    return new Intl.DateTimeFormat('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
     }).format(date);
   }
 
   // Helper function to format month and year
   function formatMonthYear(date) {
-    return new Intl.DateTimeFormat('en-US', { 
-      month: 'long', 
-      year: 'numeric' 
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      year: 'numeric'
     }).format(date);
   }
 
@@ -99,13 +101,13 @@ const MyTimetable = () => {
         console.log("Fetching user data for timetable...");
         const userResponse = await fetch("/api/auth/User");
         const userData = await userResponse.json();
-        
+
         if (userResponse.ok) {
           setUserName(userData.name);
-          
+
           const timetableResponse = await fetch(`/api/timetable?userId=${userData.id}`);
           const data = await timetableResponse.json();
-          
+
           if (timetableResponse.ok && data.success) {
             setTimetable(data.timetable);
           } else {
@@ -127,19 +129,21 @@ const MyTimetable = () => {
     fetchTimetable();
   }, []);
 
+
+
   // Get activities for a specific day
   const getActivitiesForDay = (date) => {
     if (!timetable) return [];
-    
+
     const weekday = date.getDay();
     const isWeekend = weekday === 0 || weekday === 6; // 0 is Sunday, 6 is Saturday
-    
-    const scheduleData = isWeekend ? 
-      safelyParseJSON(timetable.weekends) : 
+
+    const scheduleData = isWeekend ?
+      safelyParseJSON(timetable.weekends) :
       safelyParseJSON(timetable.weekdays);
-    
+
     if (!Array.isArray(scheduleData)) return [];
-    
+
     // Map day number to day name
     const dayMap = {
       0: "Sunday",
@@ -150,10 +154,10 @@ const MyTimetable = () => {
       5: "Friday",
       6: "Saturday"
     };
-    
+
     const dayName = dayMap[weekday];
     const daySchedule = scheduleData.find(day => day.day === dayName);
-    
+
     return daySchedule?.schedule || [];
   };
 
@@ -169,68 +173,62 @@ const MyTimetable = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-10">
+      <div className="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-10 pt-20 overflow-y-auto">
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-800">Productivity</h1>
           </div>
-          
+
           <div className="p-6">
-            <div className="flex items-center space-x-3 mb-8">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                </svg>
+            <div className="flex items-center space-x-3 mb-12 mt-2">
+              <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white">
+                <User size={20} />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Welcome,</p>
-                <p className="font-medium text-gray-800">{userName || "User"}</p>
+                <p className="font-medium text-black">{userName || "User"}</p>
               </div>
             </div>
-            
-            <nav className="space-y-1">
+
+            <nav className="space-y-2">
               <Link href="/dashboard" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
-                  <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
-                </svg>
+                <PieChart size={20} />
                 <span className="font-medium">Dashboard</span>
               </Link>
-              
+
               <a href="#" className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-blue-50 text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                </svg>
+                <Calendar size={20} />
                 <span className="font-medium">My Timetable</span>
               </a>
-              
+
               <Link href="/daily-timetable" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
+                <CheckSquare size={20} />
                 <span className="font-medium">Daily Tasks</span>
               </Link>
-              
+
               <Link href="/timetable" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                </svg>
+                <Settings size={20} />
                 <span className="font-medium">Generate Timetable</span>
               </Link>
             </nav>
           </div>
-          
-          <div className="mt-auto p-6 border-t border-gray-200">
-            <Link href="/dashboard" className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              <span>Back to Dashboard</span>
-            </Link>
+
+          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 bg-white">
+            <button
+              onClick={() => {
+                localStorage.removeItem("isLoggedIn");
+                window.dispatchEvent(new Event("storage"));
+                window.dispatchEvent(new CustomEvent("loginStateChanged"));
+                window.location.href = "/login";
+              }}
+              className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors w-full"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>
-      
+
       {/* Main content */}
       <div className="ml-64 p-8">
         <div className="max-w-6xl mx-auto">
@@ -245,7 +243,7 @@ const MyTimetable = () => {
               </button>
             </Link>
           </div>
-          
+
           {error && (
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <div className="text-center">
@@ -264,7 +262,7 @@ const MyTimetable = () => {
               </div>
             </div>
           )}
-          
+
           {timetable && (
             <>
               <div className="bg-white rounded-xl shadow-sm mb-6">
@@ -278,24 +276,24 @@ const MyTimetable = () => {
                     </div>
                     <h2 className="text-xl font-bold text-gray-800">{formatMonthYear(currentWeekStart)}</h2>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
-                    <button 
+                    <button
                       onClick={() => setActiveView("week")}
                       className={`px-3 py-1 text-sm font-medium rounded ${activeView === "week" ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:bg-gray-100"}`}
                     >
                       Week
                     </button>
-                    <button 
+                    <button
                       onClick={() => setActiveView("day")}
                       className={`px-3 py-1 text-sm font-medium rounded ${activeView === "day" ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:bg-gray-100"}`}
                     >
                       Day
                     </button>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
-                    <button 
+                    <button
                       onClick={goToPreviousWeek}
                       className="p-1 rounded-full hover:bg-gray-100"
                     >
@@ -303,13 +301,13 @@ const MyTimetable = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
-                    <button 
+                    <button
                       onClick={goToToday}
                       className="px-3 py-1 text-sm font-medium bg-gray-100 rounded hover:bg-gray-200 text-gray-700"
                     >
                       Today
                     </button>
-                    <button 
+                    <button
                       onClick={goToNextWeek}
                       className="p-1 rounded-full hover:bg-gray-100"
                     >
@@ -328,16 +326,16 @@ const MyTimetable = () => {
                       {getDaysOfWeek(currentWeekStart).map((date, index) => {
                         const isToday = new Date().toDateString() === date.toDateString();
                         const isSelected = selectedDate.toDateString() === date.toDateString();
-                        
+
                         return (
-                          <div 
+                          <div
                             key={index}
                             className={`border-r last:border-r-0 p-2 text-center ${isToday ? "bg-blue-50" : ""}`}
                           >
                             <p className="text-gray-500 text-xs uppercase font-medium">
                               {new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date)}
                             </p>
-                            <button 
+                            <button
                               onClick={() => {
                                 setSelectedDate(date);
                                 setActiveView("day");
@@ -351,41 +349,280 @@ const MyTimetable = () => {
                         );
                       })}
                     </div>
-                    
+
                     {/* Time Slots */}
                     <div className="grid grid-cols-7 border-t min-w-max">
                       {getDaysOfWeek(currentWeekStart).map((date, dayIndex) => {
                         const activities = getActivitiesForDay(date);
                         const isToday = new Date().toDateString() === date.toDateString();
-                        
+
                         return (
-                          <div 
-                            key={dayIndex} 
-                            className={`border-r last:border-r-0 relative ${isToday ? "bg-blue-50" : ""}`}
+                          <div
+                            key={dayIndex}
+                            className={`border-r last:border-r-0 ${isToday ? "bg-blue-50" : ""}`}
+                            style={{
+                              position: 'relative',
+                              minHeight: '1020px' // 17 hours * 60px per hour (6 AM to 11 PM)
+                            }}
                           >
                             {getTimeSlots().map((timeSlot, slotIndex) => (
-                              <div 
+                              <div
                                 key={slotIndex}
-                                className="h-16 border-b last:border-b-0 px-2 py-1"
+                                className="h-[60px] border-b last:border-b-0 px-2 py-1"
                               >
                                 <div className="text-xs text-gray-400 mt-1">
                                   {slotIndex === 0 && timeSlot}
                                 </div>
                               </div>
                             ))}
-                            
+
                             {/* Activities for this day */}
-                            {activities.map((activity, actIndex) => {
-                              // Calculate position and height based on start/end times
-                              // This is a simplified calculation for demonstration
-                              const startHour = parseInt(activity.start?.split(':')[0] || "9");
-                              const endHour = parseInt(activity.end?.split(':')[0] || (startHour + 1));
-                              const duration = endHour - startHour;
-                              
-                              const topPosition = (startHour - 6) * 64; // 6 is the start hour, 64 is height of each slot
-                              const height = duration * 64;
-                              
-                              // Assign a color based on activity type or index
+                            {(() => {
+                              // Google Calendar-style constants
+                              const PIXELS_PER_HOUR = 60;
+                              const PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60; // 1px per minute
+                              const START_HOUR = 6; // 6 AM
+                              const MIN_EVENT_HEIGHT = 20; // Minimum height for visibility
+
+                              // 1. Parse and Sort
+                              const items = activities.map(a => {
+                                const getMinutes = (timeStr) => {
+                                  if (!timeStr) return null;
+                                  const [h, m] = timeStr.split(':').map(Number);
+                                  return h * 60 + m;
+                                };
+
+                                let startMinutes = getMinutes(a.start || a.startTime);
+                                if (startMinutes === null) startMinutes = 9 * 60; // Default 9:00 AM
+
+                                let endMinutes = getMinutes(a.end || a.endTime);
+                                if (endMinutes === null || endMinutes <= startMinutes) {
+                                  endMinutes = startMinutes + 60; // Default to 1 hour duration
+                                }
+
+                                // Enforce minimum duration for visibility (60 mins = 60px)
+                                if (endMinutes - startMinutes < 60) {
+                                  endMinutes = startMinutes + 60;
+                                }
+
+                                // Calculate position and height with fixed scale
+                                const top = (startMinutes - (START_HOUR * 60)) * PIXELS_PER_MINUTE;
+                                const duration = endMinutes - startMinutes;
+                                const height = duration * PIXELS_PER_MINUTE;
+
+                                return {
+                                  ...a,
+                                  startMinutes,
+                                  endMinutes,
+                                  top,
+                                  height
+                                };
+                              }).sort((a, b) => a.startMinutes - b.startMinutes);
+
+                              // 2. Group connected components
+                              const groups = [];
+                              if (items.length > 0) {
+                                let currentGroup = [items[0]];
+                                let maxEnd = items[0].endMinutes;
+
+                                for (let i = 1; i < items.length; i++) {
+                                  const item = items[i];
+                                  if (item.startMinutes < maxEnd) {
+                                    currentGroup.push(item);
+                                    if (item.endMinutes > maxEnd) maxEnd = item.endMinutes;
+                                  } else {
+                                    groups.push(currentGroup);
+                                    currentGroup = [item];
+                                    maxEnd = item.endMinutes;
+                                  }
+                                }
+                                groups.push(currentGroup);
+                              }
+
+                              // 3. Process each group and render
+                              return groups.flatMap((group, groupIndex) => {
+                                const columns = [];
+                                group.forEach(item => {
+                                  let placed = false;
+                                  for (let i = 0; i < columns.length; i++) {
+                                    const col = columns[i];
+                                    // Check if this item overlaps with any item in this column
+                                    const hasOverlap = col.some(existingItem =>
+                                      !(item.endMinutes <= existingItem.startMinutes || item.startMinutes >= existingItem.endMinutes)
+                                    );
+                                    if (!hasOverlap) {
+                                      col.push(item);
+                                      item.colIndex = i;
+                                      placed = true;
+                                      break;
+                                    }
+                                  }
+                                  if (!placed) {
+                                    columns.push([item]);
+                                    item.colIndex = columns.length - 1;
+                                  }
+                                });
+
+                                const widthPercent = 100 / columns.length;
+
+                                return group.map((item, index) => {
+                                  const leftPercent = item.colIndex * widthPercent;
+
+                                  const colorClasses = [
+                                    "bg-blue-100 border-blue-300 text-blue-800",
+                                    "bg-green-100 border-green-300 text-green-800",
+                                    "bg-yellow-100 border-yellow-300 text-yellow-800",
+                                    "bg-purple-100 border-purple-300 text-purple-800",
+                                    "bg-pink-100 border-pink-300 text-pink-800",
+                                  ];
+                                  const colorClass = colorClasses[(item.startMinutes + index) % colorClasses.length];
+
+                                  return (
+                                    <div
+                                      key={`${groupIndex}-${index}`}
+                                      className={`absolute rounded border ${colorClass} p-1 overflow-hidden`}
+                                      style={{
+                                        top: `${item.top}px`,
+                                        left: `${leftPercent}%`,
+                                        width: `calc(${widthPercent}% - 2px)`,
+                                        height: `${item.height}px`,
+                                        zIndex: 10 + index,
+                                      }}
+                                    >
+                                      <div className="text-xs font-bold truncate">
+                                        {item.activity || item.name}
+                                      </div>
+                                      <div className="text-xs font-medium">
+                                        {formatTime(item.start || item.startTime)}
+                                      </div>
+                                    </div>
+                                  );
+                                });
+                              });
+                            })()}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Day View */}
+                {activeView === "day" && (
+                  <div className="calendar-day">
+                    <div className="text-center py-4 border-b">
+                      <h3 className="text-lg font-medium">{formatDate(selectedDate)}</h3>
+                    </div>
+
+                    <div className="relative" style={{ minHeight: '1020px' }}>
+                      {/* Time grid */}
+                      {getTimeSlots().map((timeSlot, index) => (
+                        <div
+                          key={index}
+                          className="flex h-[60px] border-b"
+                        >
+                          <div className="w-20 flex-shrink-0 border-r p-2 flex items-start">
+                            <span className="text-sm text-gray-500">{timeSlot}</span>
+                          </div>
+                          <div className="flex-1"></div>
+                        </div>
+                      ))}
+
+                      {/* Activities positioned absolutely */}
+                      <div className="absolute top-0 left-20 right-0" style={{ height: '1020px' }}>
+                        {(() => {
+                          const activities = getActivitiesForDay(selectedDate);
+
+                          // Google Calendar-style constants
+                          const PIXELS_PER_HOUR = 60;
+                          const PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60; // 1px per minute
+                          const START_HOUR = 6; // 6 AM
+                          const MIN_EVENT_HEIGHT = 20; // Minimum height for visibility
+
+                          // 1. Parse and Sort
+                          const items = activities.map(a => {
+                            const getMinutes = (timeStr) => {
+                              if (!timeStr) return null;
+                              const [h, m] = timeStr.split(':').map(Number);
+                              return h * 60 + m;
+                            };
+
+                            let startMinutes = getMinutes(a.start || a.startTime);
+                            if (startMinutes === null) startMinutes = 9 * 60;
+
+                            let endMinutes = getMinutes(a.end || a.endTime);
+                            if (endMinutes === null || endMinutes <= startMinutes) {
+                              endMinutes = startMinutes + 60;
+                            }
+
+                            // Enforce minimum duration for visibility (60 mins = 60px)
+                            if (endMinutes - startMinutes < 60) {
+                              endMinutes = startMinutes + 60;
+                            }
+
+                            // Calculate position and height with fixed scale
+                            const top = (startMinutes - (START_HOUR * 60)) * PIXELS_PER_MINUTE;
+                            const duration = endMinutes - startMinutes;
+                            const height = duration * PIXELS_PER_MINUTE;
+
+                            return {
+                              ...a,
+                              startMinutes,
+                              endMinutes,
+                              top,
+                              height
+                            };
+                          }).sort((a, b) => a.startMinutes - b.startMinutes);
+
+                          // 2. Group connected components
+                          const groups = [];
+                          if (items.length > 0) {
+                            let currentGroup = [items[0]];
+                            let maxEnd = items[0].endMinutes;
+
+                            for (let i = 1; i < items.length; i++) {
+                              const item = items[i];
+                              if (item.startMinutes < maxEnd) {
+                                currentGroup.push(item);
+                                if (item.endMinutes > maxEnd) maxEnd = item.endMinutes;
+                              } else {
+                                groups.push(currentGroup);
+                                currentGroup = [item];
+                                maxEnd = item.endMinutes;
+                              }
+                            }
+                            groups.push(currentGroup);
+                          }
+
+                          // 3. Process each group and render
+                          return groups.flatMap((group, groupIndex) => {
+                            const columns = [];
+                            group.forEach(item => {
+                              let placed = false;
+                              for (let i = 0; i < columns.length; i++) {
+                                const col = columns[i];
+                                // Check if this item overlaps with any item in this column
+                                const hasOverlap = col.some(existingItem =>
+                                  !(item.endMinutes <= existingItem.startMinutes || item.startMinutes >= existingItem.endMinutes)
+                                );
+                                if (!hasOverlap) {
+                                  col.push(item);
+                                  item.colIndex = i;
+                                  placed = true;
+                                  break;
+                                }
+                              }
+                              if (!placed) {
+                                columns.push([item]);
+                                item.colIndex = columns.length - 1;
+                              }
+                            });
+
+                            const widthPercent = 100 / columns.length;
+
+                            return group.map((item, index) => {
+                              const leftPercent = item.colIndex * widthPercent;
+
                               const colorClasses = [
                                 "bg-blue-100 border-blue-300 text-blue-800",
                                 "bg-green-100 border-green-300 text-green-800",
@@ -393,90 +630,37 @@ const MyTimetable = () => {
                                 "bg-purple-100 border-purple-300 text-purple-800",
                                 "bg-pink-100 border-pink-300 text-pink-800",
                               ];
-                              
-                              const colorClass = colorClasses[actIndex % colorClasses.length];
-                              
+                              const colorClass = colorClasses[(item.startMinutes + index) % colorClasses.length];
+
                               return (
                                 <div
-                                  key={actIndex}
-                                  className={`absolute left-1 right-1 rounded border ${colorClass} p-1 overflow-hidden`}
+                                  key={`${groupIndex}-${index}`}
+                                  className={`absolute rounded border ${colorClass} p-2 overflow-hidden`}
                                   style={{
-                                    top: `${topPosition}px`,
-                                    height: `${height - 2}px`, // Subtract for borders
+                                    top: `${item.top}px`,
+                                    left: `${leftPercent}%`,
+                                    width: `calc(${widthPercent}% - 4px)`,
+                                    height: `${item.height}px`,
+                                    zIndex: 10 + index,
                                   }}
                                 >
-                                  <div className="text-xs font-medium">
-                                    {formatTime(activity.start || activity.startTime)}
+                                  <div className="text-sm font-bold truncate">
+                                    {item.activity || item.name}
                                   </div>
-                                  <div className="text-xs truncate">
-                                    {activity.activity || activity.name}
+                                  <div className="text-xs font-medium">
+                                    {formatTime(item.start || item.startTime)} - {formatTime(item.end || item.endTime)}
                                   </div>
                                 </div>
                               );
-                            })}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Day View */}
-                {activeView === "day" && (
-                  <div className="calendar-day">
-                    <div className="text-center py-4 border-b">
-                      <h3 className="text-lg font-medium">{formatDate(selectedDate)}</h3>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 divide-y">
-                      {getTimeSlots().map((timeSlot, index) => {
-                        const hour = index + 6; // starting from 6 AM
-                        const activities = getActivitiesForDay(selectedDate).filter(activity => {
-                          const startHour = parseInt(activity.start?.split(':')[0] || "0");
-                          return startHour === hour;
-                        });
-                        
-                        return (
-                          <div key={index} className="flex h-20">
-                            <div className="w-20 flex-shrink-0 border-r p-2 flex items-start">
-                              <span className="text-sm text-gray-500">{timeSlot}</span>
-                            </div>
-                            <div className="flex-1 p-1 relative">
-                              {activities.map((activity, actIndex) => {
-                                // Assign a color based on activity type or index
-                                const colorClasses = [
-                                  "bg-blue-100 border-blue-300 text-blue-800",
-                                  "bg-green-100 border-green-300 text-green-800", 
-                                  "bg-yellow-100 border-yellow-300 text-yellow-800",
-                                  "bg-purple-100 border-purple-300 text-purple-800",
-                                  "bg-pink-100 border-pink-300 text-pink-800"
-                                ];
-                                
-                                const colorClass = colorClasses[actIndex % colorClasses.length];
-                                
-                                return (
-                                  <div
-                                    key={actIndex}
-                                    className={`border ${colorClass} rounded p-2 mb-1`}
-                                  >
-                                    <div className="font-medium text-sm">
-                                      {activity.activity || activity.name}
-                                    </div>
-                                    <div className="text-xs">
-                                      {formatTime(activity.start || activity.startTime)} - {formatTime(activity.end || activity.endTime)}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-                      })}
+                            });
+                          });
+                        })()}
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
-              
+
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="text-center space-y-4">
                   <Link href="/daily-timetable">

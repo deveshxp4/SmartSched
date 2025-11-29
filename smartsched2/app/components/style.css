@@ -1,0 +1,23 @@
+.bold-text {
+    font-weight: bold;
+  }
+  
+  .color_15 {
+    color: #111010; /* Example color */
+  }
+
+  .logo{
+    width: 70px;
+    height: 70px;
+    margin-top: -10px;
+   
+  }
+
+  .main{
+    margin-top: 10px;
+    margin-left: 5px;
+}
+
+.tool{
+  margin-top: -8px;
+}

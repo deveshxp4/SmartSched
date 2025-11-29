@@ -1,0 +1,632 @@
+/* From Uiverse.io by R1SH4BH81 */ 
+body{
+  overflow-x: hidden;
+}
+
+.imagewe{
+  width: 20px;
+  margin-right: 13px;
+  margin-bottom: -10px;
+
+}
+.delete-avatar-btn {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 18px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+
+.inputform{
+  padding: 10px;
+  margin: 10px;
+}
+.container{
+    /* width: 20vw;  */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 50px;
+    justify-content: center;
+    justify-items: center;
+    justify-self: center;
+    margin-left: 1220px;
+    /* margin-top: -300px; */
+}
+.form1{
+  width: 20vw;
+  margin-left: 400px;
+  margin-top: -400px;
+  margin-bottom: 100px;
+}
+
+.rom{
+  width: 800px;
+  height: auto;
+  margin-left: -500px;
+}
+.form {
+  /* margin-left: 900px; */
+  /* margin: 10px; */
+    display: flex;
+    /* width: 20vw; */
+    flex-direction: column;
+    gap: 10px;
+    background-color: #ffffff;
+    padding: 30px;
+    width: 450px;
+    border-radius: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  }
+  
+  ::placeholder {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  }
+  
+  .form button {
+    align-self: flex-end;
+  }
+  
+  .flex-column > label {
+    color: #151717;
+    font-weight: 600;
+  }
+  
+  .inputForm {
+    border: 1.5px solid #ecedec;
+    border-radius: 10px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    transition: 0.2s ease-in-out;
+  }
+  
+  .input {
+    margin-left: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 85%;
+    height: 100%;
+  }
+  
+  .input:focus {
+    outline: none;
+  }
+  
+  .inputForm:focus-within {
+    border: 1.5px solid #2d79f3;
+  }
+  
+  .flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  
+  .flex-row > div > label {
+    font-size: 14px;
+    color: black;
+    font-weight: 400;
+  }
+  
+  .span {
+    font-size: 14px;
+    margin-left: 5px;
+    color: #2d79f3;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .button-submit {
+    margin: 20px 0 10px 0;
+    background-color: #151717;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 10px;
+    height: 50px;
+    width: 100%;
+    cursor: pointer;
+  }
+  
+  .button-submit:hover {
+    background-color: #252727;
+  }
+  
+  .p {
+    text-align: center;
+    color: black;
+    font-size: 14px;
+    margin: 5px 0;
+  }
+  
+  .btn {
+    margin-top: 10px;
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+    gap: 10px;
+    border: 1px solid #ededef;
+    background-color: white;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+  }
+  
+  .btn:hover {
+    border: 1px solid #2d79f3;
+  }
+  
+  .right {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .bok {
+    width: 500px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px;
+  }
+  
+  .top {
+    margin-left: 180px;
+  }
+  
+  .main2 {
+    margin-left: 150px;
+    font-size: 55px;
+    width: 500px;
+  }
+  
+  .main3 {
+    margin-left: 150px;
+    margin-top: 30px;
+    width: 400px;
+  }
+  
+  .main4 {
+    margin-top: 10px;
+    margin-left: 150px;
+  }
+  
+  .main5 {
+    margin-top: 20px;
+    margin-left: 150px;
+  }
+  
+  .main6 {
+    width: 35px;
+    height: auto;
+  }
+  
+  .main8 {
+    margin-top: 50px;
+    width: 100%;
+    height: 400px;
+    z-index: -999;
+  }
+  
+  .tutu {
+    margin-top: -300px;
+    margin-left: 250px;
+    font-size: 40px;
+    width: 400px;
+    font-feature-settings: "abvm";
+  }
+  
+  .right1 {
+    margin-left: 700px;
+    width: 700px;
+    margin-top: -100px;
+  }
+  
+  .main10 {
+    font-size: 40px;
+    margin-left: 180px;
+  }
+  
+  .main11 {
+    margin-top: 20px;
+    margin-left: 180px;
+    width: 700px;
+  }
+  
+  .main12 {
+    margin-left: 100px;
+    margin-right: 150px;
+    gap: -10;
+  }
+  
+  .main14 {
+    margin-left: 50px;
+    margin-top: 50px;
+  }
+  
+  .main20 {
+    width: 500px;
+    height: auto;
+  }
+  
+  .right3 {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .main21 {
+    width: 500px;
+  }
+  
+  .main22 {
+    margin-top: 450px;
+    margin-left: -500px;
+  }
+  
+  .main30 {
+    width: 350px;
+    height: auto;
+  }
+  
+  .main31 {
+    width: 350px;
+    height: auto;
+    margin-top: -10px;
+  }
+  
+  .main32 {
+    width: 100%;
+    height: 600px;
+    background-color: rgb(234, 234, 234);
+    margin-top: 200px;
+    padding-top: 50px; /* Add padding to push the content down */
+  }
+  
+  .card {
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 1.5rem;
+    background-color: rgba(0, 0, 0, 1);
+    padding: 1.5rem;
+    margin-top: 50px; /* Add margin to push the card down */
+  }
+  
+  .price {
+    font-size: 3rem;
+    line-height: 1;
+    font-weight: 300;
+    letter-spacing: -0.025em;
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  .lists {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    grid-row-gap: 0.75rem;
+    row-gap: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  .list {
+    display: flex;
+    align-items: center;
+  }
+  
+  .list svg {
+    height: 1rem;
+    width: 1rem;
+  }
+  
+  .list span {
+    margin-left: 1rem;
+  }
+  
+  .action {
+    margin-top: 2rem;
+    width: 100%;
+    border: 2px solid rgba(255, 255, 255, 1);
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 1);
+    padding: 0.625rem 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: rgba(0, 0, 0, 1);
+    outline: none;
+    transition: all .2s ease;
+  }
+  
+  .action:hover {
+    color: rgba(255, 255, 255, 1);
+    background-color: transparent;
+  }
+  
+  .main34 {
+    margin-top: -450px; /* Adjust margin to push the content down */
+    margin-right: 200px; 
+  }
+  
+  .main35{
+    margin-top: 100px;
+    margin-left: 250px;
+  }
+  
+  .main37{
+    width: 600px;
+  }
+  
+  
+  .name1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; /* Ensure the button is below the text */
+    height: 100vh; /* Adjust height as needed */
+    text-align: center; /* Center text inside the div */
+    margin-top: 150px;
+  }
+  
+  .main41 {
+    /* font-size: 2rem; Adjust font size as needed */
+    margin-bottom: 20px;
+    width: 900px;
+  }
+  
+  .main45 {
+    margin-top: -33px;
+    width: 100%;
+    height: 600px;
+    z-index: -999;
+  }
+  
+  .main55{
+    margin-top: 50px;
+    margin-left: 140px;
+  }
+  
+  .main56{
+    width: 150px;
+  }
+  
+  .main57{
+    width: 10px;
+  }
+  
+  .main58{
+    width: 10px;
+  }
+  
+  .main90{
+    margin-top: 50px;
+    margin-left: 100px;
+  }
+  
+  .main89{
+    text-decoration: underline; 
+    cursor: pointer;
+  }
+  
+  /* From Uiverse.io by 0xnihilism */ 
+  .input__container {
+    position: relative;
+    background: #f0f0f0;
+    padding: 10px; /* Reduced padding */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px; /* Reduced gap */
+    border: 2px solid #000; /* Reduced border width */
+    max-width: 250px; /* Reduced max-width */
+    transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+    transform: rotateX(10deg) rotateY(-10deg);
+    perspective: 1000px;
+    box-shadow: 5px 5px 0 #000; /* Reduced shadow size */
+  }
+  
+  .input__container:hover {
+    transform: rotateX(5deg) rotateY(1deg) scale(1.05);
+    box-shadow: 15px 15px 0 -5px #e9b50b, 15px 15px 0 0 #000; /* Reduced shadow size */
+  }
+  
+  .shadow__input {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    bottom: 0;
+    z-index: -1;
+    transform: translateZ(-50px);
+    background: linear-gradient(
+      45deg,
+      rgba(255, 107, 107, 0.4) 0%,
+      rgba(255, 107, 107, 0.1) 100%
+    );
+    filter: blur(20px);
+  }
+  
+  .input__button__shadow {
+    cursor: pointer;
+    border: 2px solid #000; /* Reduced border width */
+    background: #e9b50b;
+    transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px; /* Reduced padding */
+    transform: translateZ(20px);
+    position: relative;
+    z-index: 3;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .input__button__shadow:hover {
+    background: #e9b50b;
+    transform: translateZ(10px) translateX(-5px) translateY(-5px);
+    box-shadow: 5px 5px 0 0 #000;
+  }
+  
+  .input__button__shadow svg {
+    fill: #000;
+    width: 20px; /* Reduced size */
+    height: 20px; /* Reduced size */
+  }
+  
+  .input__search {
+    width: 100%;
+    outline: none;
+    border: 2px solid #000; /* Reduced border width */
+    padding: 10px; /* Reduced padding */
+    font-size: 14px; /* Reduced font size */
+    background: #fff;
+    color: #000;
+    transform: translateZ(10px);
+    transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    z-index: 3;
+    font-family: "Roboto", Arial, sans-serif;
+    letter-spacing: -0.5px;
+  }
+  
+  .input__search::placeholder {
+    color: #666;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .input__search:hover,
+  .input__search:focus {
+    background: #f0f0f0;
+    transform: translateZ(20px) translateX(-5px) translateY(-5px);
+    box-shadow: 5px 5px 0 0 #000;
+  }
+  
+  .input__container::before {
+    content: "Email";
+    position: absolute;
+    top: -10px; /* Adjusted position */
+    left: 10px; /* Adjusted position */
+    background: #e9b50b;
+    color: #000;
+    font-weight: bold;
+    padding: 3px 5px; /* Reduced padding */
+    font-size: 12px; /* Reduced font size */
+    transform: translateZ(50px);
+    z-index: 4;
+    border: 2px solid #000;
+  }
+  
+  /* From Uiverse.io by 0800Gonza */ 
+  .card1 {
+    width: fit-content;
+    height: fit-content;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 15px; /* Reduced padding */
+    gap: 10px; /* Reduced gap */
+    margin-top: 10px;
+    z-index: 50;
+  }
+  
+  /* for all social containers*/
+  .socialContainer {
+    width: 40px; /* Reduced width */
+    height: 40px; /* Reduced height */
+    border-radius: 50%;
+    background-color: rgb(44, 44, 44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition-duration: 1s;
+  }
+  /* instagram*/
+  .containerOne:hover {
+    background-color: #d62976;
+    transition-duration: 0.3s;
+  }
+  /* twitter*/
+  .containerTwo:hover {
+    background-color: #00acee;
+    transition-duration: 0.3s;
+  }
+  /* linkdin*/
+  .containerThree:hover {
+    background-color: #0072b1;
+    transition-duration: 0.3s;
+  }
+  /* Whatsapp*/
+  .containerFour:hover {
+    background-color: #128c7e;
+    transition-duration: 0.3s;
+  }
+  
+  .socialContainer:active {
+    transform: scale(0.9);
+    transition-duration: 0.3s;
+  }
+  
+  .socialSvg {
+    width: 14px; /* Reduced size */
+  }
+  
+  .socialSvg path {
+    fill: rgb(255, 255, 255);
+  }
+  
+  .socialContainer:hover .socialSvg {
+    animation: slide-in-top 0.3s both;
+  }
+  
+  @keyframes slide-in-top {
+    0% {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+  
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .main89 {
+    position: relative;
+    background: url('/image7.png') no-repeat center center; /* Set the background image */
+    background-size: cover; /* Ensure the image covers the entire div */
+    padding: 20px;
+    margin-top: 30px;
+    cursor: alias;
+    
+    
+  }
+  .main80{
+    
+  }
+  .main89 > * {
+    position: relative;
+    z-index: 0;
+  }
+  
+  .main50{
+    z-index: 50;
+    margin-right: -10px;
+  }
+
+  

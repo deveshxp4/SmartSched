@@ -112,24 +112,49 @@ export async function POST(request) {
   }
 }
 
-// Delete a task completion
+// Delete a task completion or reset all completions for a user
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const completionId = searchParams.get('id');
+    const userId = searchParams.get('userId');
 
-    if (!completionId || isNaN(completionId)) {
-      return Response.json(
-        { success: false, error: "Invalid completion ID" },
-        { status: 400 }
-      );
+    // If completionId is provided, delete specific completion
+    if (completionId) {
+      if (isNaN(completionId)) {
+        return Response.json(
+          { success: false, error: "Invalid completion ID" },
+          { status: 400 }
+        );
+      }
+
+      await prisma.taskCompletion.delete({
+        where: { id: parseInt(completionId) }
+      });
+
+      return Response.json({ success: true });
     }
 
-    await prisma.taskCompletion.delete({
-      where: { id: parseInt(completionId) }
-    });
+    // If userId is provided, reset all completions for that user
+    if (userId) {
+      if (isNaN(userId)) {
+        return Response.json(
+          { success: false, error: "Invalid user ID" },
+          { status: 400 }
+        );
+      }
 
-    return Response.json({ success: true });
+      await prisma.taskCompletion.deleteMany({
+        where: { user_id: parseInt(userId) }
+      });
+
+      return Response.json({ success: true, message: "All task completions reset" });
+    }
+
+    return Response.json(
+      { success: false, error: "Either completion ID or user ID must be provided" },
+      { status: 400 }
+    );
   } catch (error) {
     console.error('Error deleting task completion:', error);
     return Response.json(
@@ -137,4 +162,4 @@ export async function DELETE(request) {
       { status: 500 }
     );
   }
-} 
+}
